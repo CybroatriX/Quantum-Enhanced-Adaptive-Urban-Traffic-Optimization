@@ -1,0 +1,8 @@
+PyYAML>=6.0
+traci>=1.24.0
+sumolib>=1.24.0
+pytest>=8.0
+qiskit>=1.2
+qiskit-aer>=0.15
+numpy>=1.26
+scipy>=1.13

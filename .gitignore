@@ -1,0 +1,6 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+data/sumo/four_intersection.net.xml
+data/sumo/traffic.rou.xml

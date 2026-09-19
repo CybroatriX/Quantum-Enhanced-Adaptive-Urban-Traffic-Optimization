@@ -1,0 +1,71 @@
+network:
+  intersection_ids: [J1, J2, J3, J4]
+  lanes_per_approach: 2
+  vehicles_per_lane_capacity: 12
+  network_file: data/sumo/four_intersection.net.xml
+  sumo_config_file: data/sumo/simulation.sumocfg
+simulation:
+  duration_seconds: 900
+  step_length_seconds: 1.0
+  gui: false
+  random_seed: 42
+controller:
+  default_mode: fixed
+signals:
+  fixed_time:
+    green_seconds: 30
+    yellow_seconds: 4
+    all_red_seconds: 2
+  adaptive:
+    # Preserve the fixed 30-second plan unless a meaningful directional queue
+    # imbalance exists. Adjustments apply only at green-phase boundaries.
+    reevaluation_interval_seconds: 15
+    minimum_seconds_between_adjustments: 50
+    min_green_seconds: 22
+    max_green_seconds: 42
+    base_green_seconds: 30
+    yellow_seconds: 4
+    min_cycle_seconds: 52
+    max_cycle_seconds: 92
+    low_traffic_density_threshold: 0.03
+    low_traffic_green_seconds: 30
+    low_traffic_queue_threshold: 2
+    demand_imbalance_threshold: 6
+    green_extension_seconds: 4
+    green_reduction_seconds: 2
+    density_activation_threshold: 0.10
+    density_extension_seconds: 1
+traffic:
+  default_scenario: normal
+  scenarios:
+    low:
+      vehicles_per_hour_per_route: 120
+    normal:
+      vehicles_per_hour_per_route: 300
+    high:
+      vehicles_per_hour_per_route: 540
+metrics:
+  queue_sample_interval_steps: 1
+  fuel_and_co2_enabled: false
+optimization:
+  phase3a:
+    # These match the existing adaptive controller's valid green/cycle bounds.
+    candidate_green_seconds: [22, 30, 40]
+    target_total_green_seconds: 60
+    min_green_seconds: 22
+    max_green_seconds: 42
+    yellow_seconds: 4
+    min_cycle_seconds: 52
+    max_cycle_seconds: 92
+    waiting_weight: 1.0
+    imbalance_weight: 4.0
+    cycle_weight: 20.0
+    one_hot_penalty: 1000.0
+    invalid_timing_penalty: 1000.0
+  phase3b:
+    repetitions: 2
+    shots: 2048
+    random_seed: 42
+    sensitivity_seeds: [42, 43, 44, 45, 46]
+    optimizer: COBYLA
+    optimizer_maxiter: 100

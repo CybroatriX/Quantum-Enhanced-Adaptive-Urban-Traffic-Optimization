@@ -1,0 +1,7 @@
+<configuration>
+    <input>
+        <net-file value="four_intersection.net.xml"/>
+        <route-files value="traffic.rou.xml"/>
+    </input>
+    <time><begin value="0"/></time>
+</configuration>

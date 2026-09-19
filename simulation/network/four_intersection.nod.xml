@@ -1,0 +1,14 @@
+<nodes>
+    <node id="N1" x="0" y="200" type="priority"/>
+    <node id="N2" x="200" y="200" type="priority"/>
+    <node id="W1" x="-200" y="100" type="priority"/>
+    <node id="E1" x="400" y="100" type="priority"/>
+    <node id="W2" x="-200" y="-100" type="priority"/>
+    <node id="E2" x="400" y="-100" type="priority"/>
+    <node id="S1" x="0" y="-200" type="priority"/>
+    <node id="S2" x="200" y="-200" type="priority"/>
+    <node id="J1" x="0" y="100" type="traffic_light"/>
+    <node id="J2" x="200" y="100" type="traffic_light"/>
+    <node id="J3" x="0" y="-100" type="traffic_light"/>
+    <node id="J4" x="200" y="-100" type="traffic_light"/>
+</nodes>

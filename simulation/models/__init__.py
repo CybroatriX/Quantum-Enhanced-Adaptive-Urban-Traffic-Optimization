@@ -1,0 +1,1 @@
+"""Shared typed data contracts."""

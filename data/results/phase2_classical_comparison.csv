@@ -1,0 +1,7 @@
+scenario,controller,duration_seconds,random_seed,average_waiting_time_seconds,total_waiting_time_seconds,average_queue_length,throughput_vehicles_per_hour
+Low,Fixed,300,42,14.324,974.0,3.913,816.0
+Low,Adaptive,300,42,14.324,974.0,3.913,816.0
+Normal,Fixed,300,42,14.488,2376.0,9.09,1968.0
+Normal,Adaptive,300,42,14.488,2376.0,9.09,1968.0
+High,Fixed,300,42,14.855,4397.0,16.687,3552.0
+High,Adaptive,300,42,16.141,4471.0,18.063,3324.0
