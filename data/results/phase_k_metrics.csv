@@ -1,0 +1,15 @@
+scenario,seed,controller,solver,simulation_duration_seconds,vehicle_demand,average_waiting_time_seconds,average_queue_length,throughput_vehicles_per_hour,travel_time_seconds,fuel_consumption_litres,co2_emissions_grams,fuel_source,co2_source,qaoa_recovery_rate,qaoa_objective_gap,solver_runtime_seconds
+Low,42,Fixed,exact,60.0,40,9.0,6.0,1440.0,24.0,0.51,1219.92,simulation_proxy,simulation_proxy,,,0.0
+Low,42,Adaptive,exact,60.0,40,9.375,6.0,1440.0,24.375,0.5139,1228.88,simulation_proxy,simulation_proxy,,,0.0
+Low,42,QUBO Exact,exact,60.0,40,8.55,6.0,1440.0,23.55,0.5055,1209.15,simulation_proxy,simulation_proxy,,,0.0022
+Low,42,QAOA,qaoa,60.0,40,9.35,6.0,1440.0,24.35,0.5135,1228.29,simulation_proxy,simulation_proxy,0.6,0.012,3.0216
+Normal,42,Fixed,exact,60.0,85,12.176,17.25,4140.0,27.165,1.1512,2753.79,simulation_proxy,simulation_proxy,,,0.0
+Normal,42,Adaptive,exact,60.0,85,12.135,17.25,4140.0,27.142,1.1504,2751.7,simulation_proxy,simulation_proxy,,,0.0
+Normal,42,QUBO Exact,exact,60.0,85,11.529,17.25,4140.0,26.57,1.1375,2720.9,simulation_proxy,simulation_proxy,,,0.0044
+Normal,42,QAOA,qaoa,60.0,85,11.235,17.25,4140.0,26.3,1.1313,2705.95,simulation_proxy,simulation_proxy,0.6,0.012,1.7812
+High,42,Fixed,exact,60.0,151,13.411,33.75,5640.0,28.392,2.0917,5003.47,simulation_proxy,simulation_proxy,,,0.0
+High,42,Adaptive,exact,60.0,151,12.95,33.75,6510.0,27.945,2.0743,4961.9,simulation_proxy,simulation_proxy,,,0.0
+High,42,QUBO Exact,exact,60.0,151,12.874,33.75,6660.0,27.935,2.0715,4955.03,simulation_proxy,simulation_proxy,,,0.0043
+High,42,QAOA,qaoa,60.0,151,12.874,33.75,6660.0,27.935,2.0715,4955.03,simulation_proxy,simulation_proxy,0.6,0.012,1.7394
+Emergency,42,QUBO (Emergency Priority),emergency_override,60.0,85,12.0,17.25,4080.0,27.07,1.1475,2744.81,simulation_proxy,simulation_proxy,,,
+Accident (J2),42,QUBO (Event-Adapted),exact,60.0,85,11.529,17.25,4140.0,26.57,1.1375,2720.9,simulation_proxy,simulation_proxy,,,

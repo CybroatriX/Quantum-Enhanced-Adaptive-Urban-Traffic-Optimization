@@ -11,6 +11,7 @@ from simulation.network.build_network import build_network
 from simulation.runner import SumoRunner
 from simulation.signals.adaptive import AdaptiveSignalController
 from simulation.signals.fixed_time import FixedTimeController
+from simulation.signals.qubo import QuboSignalController
 from simulation.state_reader import TrafficStateReader
 from simulation.traffic.demand import generate_routes
 
@@ -21,14 +22,14 @@ def run_simulation(
     duration: int | None = None,
     controller_mode: str | None = None,
 ) -> dict[str, object]:
-    """Run one reproducible fixed or classical-adaptive traffic experiment."""
+    """Run one reproducible fixed, classical-adaptive, or QUBO traffic experiment."""
     config = load_config(config_path)
     if duration is not None:
         config["simulation"]["duration_seconds"] = duration
     selected_scenario = scenario or config["traffic"]["default_scenario"]
     selected_controller = controller_mode or config["controller"]["default_mode"]
-    if selected_controller not in {"fixed", "adaptive"}:
-        raise ValueError("controller_mode must be 'fixed' or 'adaptive'.")
+    if selected_controller not in {"fixed", "adaptive", "qubo"}:
+        raise ValueError("controller_mode must be 'fixed', 'adaptive', or 'qubo'.")
     if not Path(config["network"]["network_file"]).exists():
         build_network()
     generate_routes(config, selected_scenario)
@@ -37,8 +38,15 @@ def run_simulation(
         intersection_ids = config["network"]["intersection_ids"]
         if selected_controller == "fixed":
             controller = FixedTimeController(traci_connection, config["signals"]["fixed_time"])
-        else:
+        elif selected_controller == "adaptive":
             controller = AdaptiveSignalController(traci_connection, config["signals"]["adaptive"])
+        else:
+            controller = QuboSignalController(
+                traci_connection,
+                config["optimization"]["phase3a"],
+                config["optimization"].get("phase3b"),
+                solver="exact",
+            )
         controller.configure(intersection_ids)
         reader = TrafficStateReader(traci_connection, config["network"]["vehicles_per_lane_capacity"])
         metrics = MetricsCollector(traci_connection)
@@ -46,7 +54,7 @@ def run_simulation(
         for _ in range(int(sim_config["duration_seconds"] / sim_config["step_length_seconds"])):
             traci_connection.simulationStep()
             latest_state = reader.read_all(intersection_ids)
-            if selected_controller == "adaptive":
+            if selected_controller in {"adaptive", "qubo"}:
                 controller.step(latest_state)
             metrics.record_step(latest_state)
         return {

@@ -1,0 +1,139 @@
+{
+  "phase": "Phase N",
+  "title": "Classical vs Quantum Traffic Signal Control Evaluation Benchmark",
+  "experiment_purpose": "Measurement and scientific research analysis of four signal-control approaches under identical network conditions, demands, and random seeds.",
+  "controllers": [
+    {
+      "name": "Fixed-Time",
+      "type": "baseline_reference",
+      "solver": "fixed",
+      "settings": {
+        "green_seconds": 30,
+        "yellow_seconds": 4,
+        "all_red_seconds": 2,
+        "cycle_seconds": 72
+      }
+    },
+    {
+      "name": "Classical Adaptive",
+      "type": "heuristic_pressure",
+      "solver": "classical_adaptive",
+      "settings": {
+        "reevaluation_interval_seconds": 15,
+        "minimum_seconds_between_adjustments": 50,
+        "min_green_seconds": 22,
+        "max_green_seconds": 42,
+        "base_green_seconds": 30,
+        "yellow_seconds": 4,
+        "min_cycle_seconds": 52,
+        "max_cycle_seconds": 92,
+        "demand_imbalance_threshold": 6,
+        "green_extension_seconds": 4,
+        "green_reduction_seconds": 2
+      }
+    },
+    {
+      "name": "QUBO Exact",
+      "type": "deterministic_classical_optimization",
+      "solver": "exact",
+      "settings": {
+        "candidate_green_seconds": [22, 30, 40],
+        "target_total_green_seconds": 60,
+        "min_green_seconds": 22,
+        "max_green_seconds": 42,
+        "yellow_seconds": 4,
+        "waiting_weight": 1.0,
+        "imbalance_weight": 4.0,
+        "cycle_weight": 20.0,
+        "one_hot_penalty": 1000.0,
+        "invalid_timing_penalty": 1000.0
+      }
+    },
+    {
+      "name": "QAOA",
+      "type": "quantum_approximate_optimization",
+      "solver": "qaoa",
+      "settings": {
+        "candidate_green_seconds": [22, 30, 40],
+        "target_total_green_seconds": 60,
+        "min_green_seconds": 22,
+        "max_green_seconds": 42,
+        "yellow_seconds": 4,
+        "waiting_weight": 1.0,
+        "imbalance_weight": 4.0,
+        "cycle_weight": 20.0,
+        "one_hot_penalty": 1000.0,
+        "invalid_timing_penalty": 1000.0,
+        "repetitions_p": 2,
+        "shots": 2048,
+        "optimizer": "COBYLA",
+        "optimizer_maxiter": 100,
+        "simulator_backend": "Qiskit AerSimulator (statevector optimization + shot sampling)"
+      }
+    }
+  ],
+  "traffic_scenarios": {
+    "Low": {
+      "vehicles_per_hour_per_route": 120,
+      "routes_count": 8,
+      "total_demand_vehicles_per_hour": 960
+    },
+    "Normal": {
+      "vehicles_per_hour_per_route": 300,
+      "routes_count": 8,
+      "total_demand_vehicles_per_hour": 2400
+    },
+    "High": {
+      "vehicles_per_hour_per_route": 540,
+      "routes_count": 8,
+      "total_demand_vehicles_per_hour": 4320
+    }
+  },
+  "seeds": [42, 101, 202, 303, 404],
+  "simulation_parameters": {
+    "duration_seconds": 60.0,
+    "step_length_seconds": 1.0,
+    "network_file": "data/sumo/four_intersection.net.xml",
+    "sumo_config_file": "data/sumo/simulation.sumocfg",
+    "intersection_ids": ["J1", "J2", "J3", "J4"],
+    "lanes_per_approach": 2,
+    "vehicles_per_lane_capacity": 12
+  },
+  "optional_events": {
+    "emergency_corridor": {
+      "emergency_vehicle_id": "AMB_EVAL",
+      "route": ["J1", "J2", "J3", "J4"],
+      "priority": "critical"
+    },
+    "accident": {
+      "event_id": "ACC_EVAL_01",
+      "affected_intersections": ["J2"],
+      "affected_approaches": ["east"],
+      "severity": "high",
+      "capacity_factor": 0.35,
+      "queue_adder": 18
+    },
+    "road_closure": {
+      "event_id": "CLOSURE_EVAL_01",
+      "affected_intersections": ["J3"],
+      "affected_approaches": ["south"],
+      "severity": "high",
+      "capacity_factor": 0.0
+    },
+    "traffic_surge": {
+      "event_id": "SURGE_EVAL_01",
+      "affected_intersections": ["J1"],
+      "affected_approaches": ["north", "south"],
+      "severity": "medium",
+      "queue_adder": 12
+    }
+  },
+  "environment": {
+    "python_version": "3.14.4",
+    "sumo_version": "1.27.1",
+    "traci_version": "1.27.1",
+    "qiskit_version": "2.5.2",
+    "qiskit_aer_version": "0.17.2",
+    "host_os": "Windows"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "cybroatrix-urban-twin",
+  "version": "3.0.0",
+  "private": true,
+  "description": "Eight-junction quantum-enhanced traffic digital twin with emergency corridors and sustainability analytics",
+  "scripts": {
+    "start": "node web/server.js",
+    "dev": "node --watch web/server.js",
+    "test": "node --test web/tests/*.test.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
