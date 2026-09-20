@@ -1,0 +1,437 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#07101e">
+  <meta name="description" content="Quantum-enhanced adaptive urban traffic optimization digital twin.">
+  <title>FlowQ — Quantum Mobility Command</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark"><span>FQ</span></div>
+        <div>
+          <small>CYBROATRIX • QUANTUM MOBILITY LAB</small>
+          <h1>FlowQ <em>Command</em></h1>
+        </div>
+      </div>
+      <div class="top-center">
+        <span class="mission-tag">LIVE DIGITAL TWIN</span>
+        <span class="system-health"><i></i><b id="backendStatus">LOCAL ENGINE</b></span>
+        <span class="system-health" id="qaoaStatusBadge"><i style="background:var(--violet);box-shadow:0 0 10px var(--violet);"></i><b id="qaoaStatus">QAOA READY</b></span>
+      </div>
+      <div class="header-actions">
+        <div class="clock"><small>SIMULATION TIME</small><b id="simClock">00:00:00</b></div>
+        <button id="pauseBtn" class="pause-btn" title="Pause simulation" aria-label="Pause simulation"><span>Ⅱ</span> Pause</button>
+        <button id="resetBtn" class="pause-btn" title="Reset simulation" aria-label="Reset simulation"><span>↺</span> Reset</button>
+      </div>
+    </header>
+
+    <aside class="left-panel panel scroll-panel">
+      <section class="intro-card">
+        <div class="eyebrow">MISSION CONTROL</div>
+        <h2>Adaptive city scenario</h2>
+        <p>Eight connected junctions. One live hybrid optimization loop.</p>
+        <label class="field-label" for="scenarioSelect">Traffic scenario</label>
+        <select id="scenarioSelect">
+          <option value="normal">Normal Traffic (180 veh/h)</option>
+          <option value="low">Low Traffic (60 veh/h)</option>
+          <option value="high">High Congestion (360 veh/h)</option>
+          <option value="emergency">Emergency Corridor (J1→J4)</option>
+          <option value="accident">Accident at J2 East</option>
+        </select>
+        <label class="field-label" for="seedInput" style="margin-top: 8px;">Reproducible city seed</label>
+        <div class="seed-row">
+          <input id="seedInput" value="COIMBATORE-08" maxlength="40" spellcheck="false">
+          <button id="randomSeedBtn" class="square-btn" title="Random seed" aria-label="Create random seed">↻</button>
+        </div>
+        <button id="generateBtn" class="primary wide">Regenerate scenario</button>
+      </section>
+
+      <section>
+        <div class="section-title"><h2>Control strategy</h2><span id="controllerState">HYBRID QUBO</span></div>
+        <label class="field-label" for="controllerSelect">Signal algorithm</label>
+        <select id="controllerSelect">
+          <option value="qubo">Hybrid QUBO adaptive (Exact)</option>
+          <option value="qaoa">Quantum QAOA research mode</option>
+          <option value="adaptive">Classical pressure adaptive</option>
+          <option value="fixed">Fixed 30 / 30 seconds</option>
+        </select>
+        <label class="slider-label" for="demandRange"><span>Traffic demand</span><output id="demandValue">180 veh/h</output></label>
+        <input id="demandRange" type="range" min="60" max="360" step="10" value="180">
+        <label class="slider-label" for="pedestrianRange"><span>Pedestrian demand</span><output id="pedestrianValue">35%</output></label>
+        <input id="pedestrianRange" type="range" min="0" max="100" step="5" value="35">
+        <label class="slider-label" for="speedRange"><span>Simulation speed</span><output id="speedValue">1.0×</output></label>
+        <input id="speedRange" type="range" min="0.5" max="4" step="0.5" value="1">
+      </section>
+
+      <section>
+        <div class="section-title"><h2>Scenario injector</h2><span id="toolState">INSPECT</span></div>
+        <div class="tool-grid">
+          <button id="congestionBtn" class="map-action congestion"><b>≋</b><span>Congestion</span></button>
+          <button id="accidentBtn" class="map-action accident"><b>!</b><span>Accident</span></button>
+          <button id="closureBtn" class="map-action closure"><b>×</b><span>Road closure</span></button>
+          <button id="ambulanceBtn" class="map-action ambulance"><b>+</b><span>Ambulance</span></button>
+          <button id="hospitalBtn" class="map-action hospital"><b>H</b><span>Hospital</span></button>
+          <button id="inspectBtn" class="map-action active"><b>⌖</b><span>Inspect</span></button>
+        </div>
+        <div class="action-btn-row" style="display: flex; gap: 6px; margin: 8px 0 4px;">
+          <button id="triggerAmbulanceCorridorBtn" class="secondary wide" title="Dispatch AMB001 along corridor">🚑 AMB Corridor</button>
+          <button id="releaseCorridorBtn" class="secondary wide" title="Release corridor back to QUBO">Release</button>
+        </div>
+        <div class="action-btn-row" style="display: flex; gap: 6px; margin-bottom: 6px;">
+          <button id="injectAccidentJ2Btn" class="secondary wide" title="Inject accident at J2">Accident J2</button>
+          <button id="injectClosureJ3Btn" class="secondary wide" title="Inject closure at J3">Closure J3</button>
+          <button id="injectSurgeBtn" class="secondary wide" title="Inject surge demand">Surge</button>
+        </div>
+        <button id="clearEventsBtn" class="secondary wide">Restore normal network</button>
+        <p id="placementHelp" class="placement-help">Select a junction to inspect queues and signals.</p>
+      </section>
+
+      <section>
+        <div class="section-title"><h2>Map intelligence</h2><span>LIVE</span></div>
+        <label class="toggle"><span><i class="dot heat"></i>Congestion heatmap</span><input id="heatToggle" type="checkbox" checked><u></u></label>
+        <label class="toggle"><span><i class="dot route"></i>Emergency corridor</span><input id="routeToggle" type="checkbox" checked><u></u></label>
+        <label class="toggle"><span><i class="dot camera"></i>Junction cameras</span><input id="cameraToggle" type="checkbox" checked><u></u></label>
+        <label class="toggle"><span><i class="dot labels"></i>Road capacity labels</span><input id="capacityToggle" type="checkbox"><u></u></label>
+      </section>
+
+      <section class="quantum-note">
+        <div class="quantum-orbit"><i></i><i></i><i></i></div>
+        <div><strong>Where quantum is used</strong><p>Live queues form a QUBO. Nine feasible signal pairs are evaluated; QAOA remains available in the Python research module.</p></div>
+      </section>
+    </aside>
+
+    <main class="map-wrap" id="mapWrap">
+      <canvas id="cityCanvas" aria-label="Interactive eight-junction traffic map"></canvas>
+      <div class="map-toolbar">
+        <div><small>NETWORK</small><b id="mapSeed">COIMBATORE-08</b></div>
+        <span class="map-mode" id="mapMode">INSPECT MODE</span>
+      </div>
+      <div class="map-kpis">
+        <article><span>VEHICLES</span><b id="vehicleMetric">0</b><small id="queueMetric">0 queued</small></article>
+        <article><span>AVG WAIT</span><b id="waitMetric">0.0s</b><small id="waitDelta">— vs fixed</small></article>
+        <article><span>THROUGHPUT</span><b id="throughputMetric">0</b><small>vehicles/hour</small></article>
+        <article><span>CO₂ SAVED</span><b id="co2SavedMetric">0.0kg</b><small>vs fixed baseline</small></article>
+      </div>
+      <div class="zoom-controls" aria-label="Map zoom controls">
+        <button id="zoomInBtn" aria-label="Zoom in">+</button>
+        <button id="zoomOutBtn" aria-label="Zoom out">−</button>
+        <button id="fitBtn" aria-label="Fit city to map">⌂</button>
+      </div>
+      <div class="map-legend">
+        <span><i class="legend-road arterial"></i>Arterial</span>
+        <span><i class="legend-road collector"></i>Collector</span>
+        <span><i class="legend-vehicle car"></i>Vehicle</span>
+        <span><i class="legend-vehicle emergency"></i>Ambulance</span>
+        <span><i class="legend-corridor"></i>Green corridor</span>
+      </div>
+      <div class="map-tip">Wheel to zoom • drag to move • click to inject or inspect</div>
+      <div id="toast" class="toast" hidden></div>
+    </main>
+
+    <aside class="right-panel panel scroll-panel">
+      <!-- DASHBOARD TABS -->
+      <div class="dashboard-tabs" role="tablist">
+        <button id="tabLiveBtn" class="tab-btn active" data-tab="tabLive" role="tab" aria-selected="true">Junction</button>
+        <button id="tabNetworkBtn" class="tab-btn" data-tab="tabNetwork" role="tab" aria-selected="false">Network</button>
+        <button id="tabEmergencyBtn" class="tab-btn" data-tab="tabEmergency" role="tab" aria-selected="false">Emergency</button>
+        <button id="tabEventsBtn" class="tab-btn" data-tab="tabEvents" role="tab" aria-selected="false">Events</button>
+        <button id="tabMetricsBtn" class="tab-btn" data-tab="tabMetrics" role="tab" aria-selected="false">Metrics</button>
+        <button id="tabResearchBtn" class="tab-btn" data-tab="tabResearch" role="tab" aria-selected="false">QAOA</button>
+        <button id="tabRealworldBtn" class="tab-btn" data-tab="tabRealworld" role="tab" aria-selected="false">Real-World</button>
+      </div>
+
+      <!-- TAB 1: Selected Junction & Signals -->
+      <div id="tabLive" class="tab-pane active">
+        <section>
+          <div class="section-title"><h2>Selected junction</h2><span id="junctionName">J-01</span></div>
+          <h3 id="junctionTitle">Harbor Gate</h3>
+          <div class="signal-grid">
+            <div class="approach-card">
+              <span>NORTH</span>
+              <div class="traffic-light" id="nLight"><i class="red"></i><i class="yellow"></i><i class="green"></i></div>
+              <b id="nSignalText">GREEN</b>
+              <small>Independent approach</small>
+            </div>
+            <div class="approach-card">
+              <span>SOUTH</span>
+              <div class="traffic-light" id="sLight"><i class="red"></i><i class="yellow"></i><i class="green"></i></div>
+              <b id="sSignalText">RED</b>
+              <small>Independent approach</small>
+            </div>
+            <div class="approach-card">
+              <span>EAST</span>
+              <div class="traffic-light" id="eLight"><i class="red"></i><i class="yellow"></i><i class="green"></i></div>
+              <b id="eSignalText">RED</b>
+              <small>Independent approach</small>
+            </div>
+            <div class="approach-card">
+              <span>WEST</span>
+              <div class="traffic-light" id="wLight"><i class="red"></i><i class="yellow"></i><i class="green"></i></div>
+              <b id="wSignalText">RED</b>
+              <small>Independent approach</small>
+            </div>
+          </div>
+          <div class="phase-row"><span id="phaseLabel">N GREEN</span><b id="phaseTimer">16s</b></div>
+          <div class="junction-facts"><span>Density <b id="junctionDensity">0%</b></span><span>Capacity <b id="junctionCapacity">0</b></span><span>Pedestrians <b id="junctionPedestrians">0</b></span></div>
+
+          <div class="directional-strip" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-top: 8px; text-align: center;">
+            <div style="background: rgba(14,26,39,.6); padding: 4px; border-radius: 4px; border: 1px solid var(--line);"><small style="display:block; font-size: 0.55rem; color: var(--muted);">NORTH</small><b id="northQueue" style="font-size: 0.75rem; color: var(--cyan);">0</b></div>
+            <div style="background: rgba(14,26,39,.6); padding: 4px; border-radius: 4px; border: 1px solid var(--line);"><small style="display:block; font-size: 0.55rem; color: var(--muted);">SOUTH</small><b id="southQueue" style="font-size: 0.75rem; color: var(--cyan);">0</b></div>
+            <div style="background: rgba(14,26,39,.6); padding: 4px; border-radius: 4px; border: 1px solid var(--line);"><small style="display:block; font-size: 0.55rem; color: var(--muted);">EAST</small><b id="eastQueue" style="font-size: 0.75rem; color: var(--mint);">0</b></div>
+            <div style="background: rgba(14,26,39,.6); padding: 4px; border-radius: 4px; border: 1px solid var(--line);"><small style="display:block; font-size: 0.55rem; color: var(--muted);">WEST</small><b id="westQueue" style="font-size: 0.75rem; color: var(--mint);">0</b></div>
+          </div>
+
+          <div class="class-strip" style="display: flex; justify-content: space-between; margin-top: 6px; font-size: 0.58rem; color: var(--muted);">
+            <span>Cars: <b id="carCount" style="color: #fff;">0</b></span>
+            <span>Buses: <b id="busCount" style="color: #fff;">0</b></span>
+            <span>Service: <b id="serviceCount" style="color: #fff;">0</b></span>
+            <span>Amb: <b id="ambulanceCount" style="color: var(--amber);">0</b></span>
+          </div>
+
+          <div class="perception-strip" style="display: flex; justify-content: space-between; margin-top: 5px; font-size: 0.55rem; color: #7f95a8; border-top: 1px solid var(--line); padding-top: 4px;">
+            <span>Tracked: <b id="trackedCount" style="color: var(--mint);">0</b></span>
+            <span>Confidence: <b id="detectionConfidence" style="color: var(--cyan);">97.4%</b></span>
+            <span>Contract: <b id="observationFreshness" style="color: var(--mint);">Live (&lt;1s)</b></span>
+          </div>
+        </section>
+
+        <section class="optimizer-section">
+          <div class="section-title"><h2>Hybrid optimizer</h2><span id="algorithmSource">LOCAL QUBO</span></div>
+          <div class="algorithm-card">
+            <div><small>NS GREEN</small><b id="quboNs">30s</b></div>
+            <div><small>EW GREEN</small><b id="quboEw">30s</b></div>
+            <div><small>OBJECTIVE</small><b id="quboObjective">0.000</b></div>
+          </div>
+          <p id="algorithmStatus" class="algorithm-status">Waiting for the first optimization cycle.</p>
+        </section>
+
+        <section>
+          <div class="section-title"><h2>Junction camera</h2><span id="cameraName">CAM-01</span></div>
+          <div class="camera-feed">
+            <canvas id="cameraCanvas"></canvas>
+            <div class="scan-line"></div>
+            <span class="live-badge"><i></i>SIM LIVE</span>
+          </div>
+          <div class="camera-stats">
+            <span>Vehicles <b id="cameraVehicleCount">0</b></span>
+            <span>Queued <b id="cameraQueueCount">0</b></span>
+            <span>Emergency <b id="cameraEmergencyCount">0</b></span>
+          </div>
+        </section>
+
+        <section>
+          <div class="section-title"><h2>Event timeline</h2><span id="eventCount">0 EVENTS</span></div>
+          <div id="eventStream" class="event-stream" aria-live="polite"></div>
+        </section>
+      </div>
+
+      <!-- TAB 2: Network Grid (J1–J4 / J1–J8) -->
+      <div id="tabNetwork" class="tab-pane hidden">
+        <section>
+          <div class="section-title"><h2>Network overview</h2><span>J1–J8 CONNECTED</span></div>
+          <p class="panel-subtitle" style="font-size: 0.6rem; color: var(--muted); margin: 0 0 8px;">Synchronized network topology. Click any junction to inspect details.</p>
+          <div id="networkGrid" class="network-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <!-- Rendered dynamically -->
+          </div>
+        </section>
+      </div>
+
+      <!-- TAB 3: Emergency Corridor (Phase I) -->
+      <div id="tabEmergency" class="tab-pane hidden">
+        <section id="corridorSection" class="corridor-card active">
+          <div class="section-title"><h2>Emergency green corridor</h2><span id="corridorStatus">STANDBY</span></div>
+          <div class="corridor-route"><b id="corridorRoute">No active ambulance</b><span id="corridorEta">Dispatch one from the map</span></div>
+          <div class="corridor-progress"><i id="corridorBar"></i></div>
+          <div class="corridor-telemetry" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin: 8px 0; font-size: 0.6rem;">
+            <div style="background: rgba(14,26,39,.6); padding: 5px; border-radius: 4px; border: 1px solid var(--line);"><small style="display:block; color: var(--muted);">VEHICLE ID</small><b id="emergencyVehId" style="color: var(--amber);">AMB001</b></div>
+            <div style="background: rgba(14,26,39,.6); padding: 5px; border-radius: 4px; border: 1px solid var(--line);"><small style="display:block; color: var(--muted);">CORRIDOR ROUTE</small><b id="emergencyRouteSummary">J1 → J4</b></div>
+            <div style="background: rgba(14,26,39,.6); padding: 5px; border-radius: 4px; border: 1px solid var(--line);"><small style="display:block; color: var(--muted);">PRIORITY APPROACH</small><b id="emergencyPriorityAppr" style="color: var(--mint);">West (P2)</b></div>
+            <div style="background: rgba(14,26,39,.6); padding: 5px; border-radius: 4px; border: 1px solid var(--line);"><small style="display:block; color: var(--muted);">OVERRIDE TIMING</small><b id="emergencyOverrideStatus" style="color: var(--mint);">40s / 22s</b></div>
+          </div>
+          <div class="action-btn-row" style="display: flex; flex-direction: column; gap: 6px; margin-top: 8px;">
+            <button id="btnDispatchCorridor" class="primary wide">🚑 Dispatch AMB001 Corridor</button>
+            <button id="btnAdvanceCorridor" class="secondary wide">Advance Intersection</button>
+            <button id="btnReleaseCorridor" class="secondary wide">Release Corridor</button>
+          </div>
+          <p style="margin-top: 8px;">Deterministic preemption guarantees green wave progression along corridor and cleanly restores canonical QUBO upon release.</p>
+        </section>
+      </div>
+
+      <!-- TAB 4: Dynamic Events (Phase J) -->
+      <div id="tabEvents" class="tab-pane hidden">
+        <section>
+          <div class="section-title"><h2>Dynamic traffic events</h2><span id="activeEventBadge">0 ACTIVE</span></div>
+          <p class="panel-subtitle" style="font-size: 0.6rem; color: var(--muted); margin: 0 0 8px;">Inject incidents altering effective capacity and queues before QUBO optimization.</p>
+          <div class="tool-grid" style="margin-bottom: 8px;">
+            <button id="evInjectAccidentBtn" class="secondary">Accident J2</button>
+            <button id="evInjectClosureBtn" class="secondary">Closure J3</button>
+            <button id="evInjectSurgeBtn" class="secondary">Surge +50%</button>
+            <button id="evInjectPedestrianBtn" class="secondary">Pedestrian</button>
+          </div>
+          <div id="eventsList" class="events-list" style="display: flex; flex-direction: column; gap: 6px;">
+            <p class="empty-state" style="font-size: 0.62rem; color: var(--muted); text-align: center; padding: 12px 0;">No active road disruptions.</p>
+          </div>
+        </section>
+      </div>
+
+      <!-- TAB 5: Metrics & Telemetry (Phase K) -->
+      <div id="tabMetrics" class="tab-pane hidden">
+        <section>
+          <div class="section-title"><h2>Network performance</h2><span>LIVE MODEL</span></div>
+          <div class="provenance-banner" style="background: rgba(14,26,39,.7); border: 1px solid rgba(86,199,255,.2); border-radius: 6px; padding: 6px 8px; margin-bottom: 8px;">
+            <span class="prov-badge proxy" style="display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 0.52rem; font-weight: 800; background: rgba(86,199,255,.15); color: var(--cyan); border: 1px solid rgba(86,199,255,.3);">SIMULATION PROXY (UNCALIBRATED)</span>
+            <p style="margin: 4px 0 0; font-size: 0.55rem; color: var(--muted); line-height: 1.35;">Kinematic proxy fuel & CO₂: Idle: 0.00025 L/s, Cruise: 0.00070 L/s, 2392 g CO₂/L. Physical values queried in SUMO mode.</p>
+          </div>
+          <div class="metrics">
+            <article><small>QUEUE LENGTH</small><b id="networkQueueMetric">0</b><span>vehicles</span></article>
+            <article><small>ROAD UTILIZATION</small><b id="densityMetric">0%</b><span>network mean</span></article>
+            <article><small>FUEL USE</small><b id="fuelMetric">0.00L</b><span style="font-size: 0.55rem; color: #7f95a8;">proxy</span></article>
+            <article><small>CO₂ OUTPUT</small><b id="co2Metric">0.00kg</b><span style="font-size: 0.55rem; color: #7f95a8;">proxy</span></article>
+            <article><small>PEDESTRIAN WAIT</small><b id="pedWaitMetric">0.0s</b><span>crossing demand</span></article>
+            <article><small>ACTIVE EVENTS</small><b id="incidentMetric">0</b><span id="ambulanceMetric">0 ambulances</span></article>
+          </div>
+        </section>
+
+        <section>
+          <div class="section-title"><h2>Empirical controller comparison</h2><span id="winnerBadge">MEASURED DELTA</span></div>
+          <div class="comparison">
+            <div class="comparison-head"><span>METRIC</span><span>FIXED</span><span>HYBRID</span></div>
+            <div><b>Average wait</b><span id="fixedWait">0.0s</span><strong id="hybridWait">0.0s</strong></div>
+            <div><b>Queue</b><span id="fixedQueue">0</span><strong id="hybridQueue">0</strong></div>
+            <div><b>Fuel</b><span id="fixedFuel">0.00L</span><strong id="hybridFuel">0.00L</strong></div>
+            <div><b>CO₂</b><span id="fixedCo2">0.00kg</span><strong id="hybridCo2">0.00kg</strong></div>
+          </div>
+          <div class="impact-bars">
+            <label><span>Waiting-time difference</span><b id="waitReduction">0%</b></label><div><i id="waitBar"></i></div>
+            <label><span>Emission difference</span><b id="emissionReduction">0%</b></label><div><i id="emissionBar"></i></div>
+          </div>
+          <p style="font-size: 0.55rem; color: var(--muted); margin-top: 8px;">Non-ranking research evaluation. Measurements recorded across identical demand states without subjective scoring.</p>
+        </section>
+      </div>
+
+      <!-- TAB 6: Quantum QAOA Research Panel (Phase 3B) -->
+      <div id="tabResearch" class="tab-pane hidden">
+        <section>
+          <div class="section-title"><h2>Quantum QAOA research</h2><span class="prov-badge qaoa" style="display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 0.52rem; font-weight: 800; background: rgba(154,124,255,.15); color: var(--violet); border: 1px solid rgba(154,124,255,.3);">QISKIT AER</span></div>
+          <div class="qaoa-spec-card" style="background: rgba(14,26,39,.6); border: 1px solid var(--line); border-radius: 8px; padding: 8px; margin: 8px 0; font-size: 0.6rem; display: flex; flex-direction: column; gap: 6px;">
+            <div style="display:flex; justify-content:space-between;"><span style="color:var(--muted);">Circuit Model</span><b style="color:#fff;">2-Qubit Ising Hamiltonian</b></div>
+            <div style="display:flex; justify-content:space-between;"><span style="color:var(--muted);">Variational Depth</span><b style="color:#fff;">p = 1 (Gamma / Beta)</b></div>
+            <div style="display:flex; justify-content:space-between;"><span style="color:var(--muted);">Simulator Backend</span><b style="color:var(--cyan);">AerSimulator Statevector</b></div>
+            <div style="display:flex; justify-content:space-between;"><span style="color:var(--muted);">QUBO Objective</span><b id="qaoaObjectiveVal" style="color:var(--mint);">0.0000</b></div>
+            <div style="display:flex; justify-content:space-between;"><span style="color:var(--muted);">Ground State Gap</span><b id="qaoaGapVal" style="color:var(--mint);">0.000000</b></div>
+            <div style="display:flex; justify-content:space-between;"><span style="color:var(--muted);">Optimum Recovery</span><b id="qaoaRecoveryVal" style="color:var(--mint);">100%</b></div>
+            <div style="display:flex; justify-content:space-between;"><span style="color:var(--muted);">Execution Mode</span><b id="qaoaSolverStatus" style="color:var(--violet);">Research Background Loop</b></div>
+          </div>
+          <p style="font-size: 0.56rem; color: var(--muted); line-height: 1.4;">Quantum Approximate Optimization Algorithm evaluates Ising Hamiltonian parameters asynchronously without blocking live rendering.</p>
+        </section>
+      </div>
+
+      <!-- TAB 7: Real-World Prototype (Phase M) -->
+      <div id="tabRealworld" class="tab-pane hidden">
+        <section>
+          <div class="section-title"><h2>Real-World Prototype</h2><span id="realworldBadge" class="prov-badge" style="display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 0.52rem; font-weight: 800; background: rgba(0,229,153,.15); color: var(--mint); border: 1px solid rgba(0,229,153,.3);">RESEARCH INTERFACE</span></div>
+          <div class="provenance-banner" style="background: rgba(14,26,39,.7); border: 1px solid rgba(255,170,0,.3); border-radius: 6px; padding: 6px 8px; margin-bottom: 8px;">
+            <span style="display: block; font-size: 0.55rem; font-weight: 800; color: var(--amber); margin-bottom: 2px;">PROTOTYPE RESEARCH INTERFACE — NOT CONNECTED TO PHYSICAL HARDWARE</span>
+            <p style="margin: 0; font-size: 0.53rem; color: var(--muted); line-height: 1.35;">Strictly isolated from simulation data. Outputs Prototype Signal Recommendations for analysis.</p>
+          </div>
+
+          <label class="field-label" for="rwSourceSelect">Input source</label>
+          <select id="rwSourceSelect">
+            <option value="image">Local Image</option>
+            <option value="video">Local Video File</option>
+            <option value="camera">Webcam / Camera Feed</option>
+            <option value="rtsp">RTSP Stream Interface</option>
+            <option value="synthetic">Synthetic Test Generator</option>
+          </select>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 6px;">
+            <div>
+              <label class="field-label" for="rwIntersectionSelect">Intersection</label>
+              <select id="rwIntersectionSelect">
+                <option value="J1">J1 — Junction 1</option>
+                <option value="J2">J2 — Junction 2</option>
+                <option value="J3">J3 — Junction 3</option>
+                <option value="J4">J4 — Junction 4</option>
+                <option value="J5">J5 — Junction 5</option>
+                <option value="J6">J6 — Junction 6</option>
+                <option value="J7">J7 — Junction 7</option>
+                <option value="J8">J8 — Junction 8</option>
+              </select>
+            </div>
+            <div>
+              <label class="field-label" for="rwRoiPreset">Approach ROI</label>
+              <select id="rwRoiPreset">
+                <option value="standard">Standard 4-Way</option>
+                <option value="asymmetric">Asymmetric Highway</option>
+                <option value="dense">Downtown Urban</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="rwSourceInputGroup" style="margin-top: 6px;">
+            <label class="field-label" for="rwSourcePath" id="rwSourcePathLabel">Source path / URL</label>
+            <input id="rwSourcePath" type="text" placeholder="e.g. data/sample.jpg or rtsp://192.168.1.10/live" style="width: 100%; box-sizing: border-box; background: rgba(14,26,39,.8); border: 1px solid var(--line); color: #fff; padding: 6px; border-radius: 4px; font-size: 0.65rem;">
+          </div>
+
+          <div class="action-btn-row" style="display: flex; gap: 6px; margin: 8px 0;">
+            <button id="btnRunPerception" class="primary wide">▶ Run Perception</button>
+            <button id="btnClearPerception" class="secondary wide">Clear</button>
+          </div>
+
+          <div class="connection-status-row" style="display: flex; justify-content: space-between; align-items: center; font-size: 0.58rem; color: var(--muted); margin-bottom: 6px;">
+            <span>STATUS: <b id="rwStatusText" style="color: var(--cyan);">STANDBY</b></span>
+            <span>SOURCE: <b id="rwActiveSourceLabel" style="color: #fff;">image</b></span>
+          </div>
+
+          <!-- Real-World Telemetry Display -->
+          <div class="directional-strip" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-top: 4px; text-align: center;">
+            <div style="background: rgba(14,26,39,.6); padding: 4px; border-radius: 4px; border: 1px solid var(--line);"><small style="display:block; font-size: 0.55rem; color: var(--muted);">NORTH</small><b id="rwNorthQueue" style="font-size: 0.75rem; color: var(--cyan);">0</b></div>
+            <div style="background: rgba(14,26,39,.6); padding: 4px; border-radius: 4px; border: 1px solid var(--line);"><small style="display:block; font-size: 0.55rem; color: var(--muted);">SOUTH</small><b id="rwSouthQueue" style="font-size: 0.75rem; color: var(--cyan);">0</b></div>
+            <div style="background: rgba(14,26,39,.6); padding: 4px; border-radius: 4px; border: 1px solid var(--line);"><small style="display:block; font-size: 0.55rem; color: var(--muted);">EAST</small><b id="rwEastQueue" style="font-size: 0.75rem; color: var(--mint);">0</b></div>
+            <div style="background: rgba(14,26,39,.6); padding: 4px; border-radius: 4px; border: 1px solid var(--line);"><small style="display:block; font-size: 0.55rem; color: var(--muted);">WEST</small><b id="rwWestQueue" style="font-size: 0.75rem; color: var(--mint);">0</b></div>
+          </div>
+
+          <div class="class-strip" style="display: flex; justify-content: space-between; margin-top: 6px; font-size: 0.58rem; color: var(--muted);">
+            <span>Cars: <b id="rwCarCount" style="color: #fff;">0</b></span>
+            <span>Buses: <b id="rwBusCount" style="color: #fff;">0</b></span>
+            <span>Trucks: <b id="rwTruckCount" style="color: #fff;">0</b></span>
+            <span>M-Cycles: <b id="rwMotoCount" style="color: #fff;">0</b></span>
+          </div>
+
+          <div class="perception-strip" style="display: flex; justify-content: space-between; margin-top: 5px; font-size: 0.55rem; color: #7f95a8; border-top: 1px solid var(--line); padding-top: 4px;">
+            <span>Total: <b id="rwTotalVehicles" style="color: var(--cyan);">0</b></span>
+            <span>Tracked: <b id="rwTrackedVehicles" style="color: var(--mint);">0</b></span>
+            <span>Confidence: <b id="rwAvgConfidence" style="color: var(--mint);">0.0%</b></span>
+          </div>
+        </section>
+
+        <!-- Prototype Signal Recommendation Card -->
+        <section class="optimizer-section" style="margin-top: 8px;">
+          <div class="section-title"><h2>Signal recommendation</h2><span id="rwSolverLabel">QUBO EXACT</span></div>
+          <p style="font-size: 0.52rem; color: var(--amber); margin: 0 0 6px; font-weight: 700;">PROTOTYPE SIGNAL RECOMMENDATION — NOT DIRECT HARDWARE CONTROL</p>
+          <div class="algorithm-card">
+            <div><small>NS GREEN (G0)</small><b id="rwRecNs">30s</b></div>
+            <div><small>EW GREEN (G2)</small><b id="rwRecEw">30s</b></div>
+            <div><small>OBJECTIVE</small><b id="rwRecObjective">0.000</b></div>
+          </div>
+          <div style="font-size: 0.55rem; color: var(--muted); margin-top: 6px; display: flex; justify-content: space-between;">
+            <span>Cycle Length: <b id="rwRecCycle">68s</b> (Yellow=4s)</span>
+            <span>Validity: <b id="rwRecValid" style="color: var(--mint);">TRUE</b></span>
+          </div>
+          <p id="rwRecommendationNote" style="font-size: 0.52rem; color: var(--muted); line-height: 1.35; margin-top: 6px;">Recommended green timing calculated via canonical QUBO formulation based on real-world perception queues.</p>
+        </section>
+      </div>
+    </aside>
+  </div>
+
+  <script src="./simulation-core.js"></script>
+  <script src="./optimizer.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>

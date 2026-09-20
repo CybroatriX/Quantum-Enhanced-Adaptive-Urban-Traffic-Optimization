@@ -32,6 +32,18 @@ class TrafficStateReader:
     def read_all(self, intersection_ids: list[str]) -> list[IntersectionTrafficState]:
         return [self.read_intersection(intersection_id) for intersection_id in intersection_ids]
 
+    def read_observation(self, intersection_id: str, timestamp: float | None = None) -> Any:
+        """Read intersection state from SUMO and return as canonical TrafficObservation."""
+        state = self.read_intersection(intersection_id)
+        from perception.models import TrafficObservation
+        return TrafficObservation.from_intersection_traffic_state(state, source="sumo", timestamp=timestamp)
+
+    def read_all_observations(
+        self, intersection_ids: list[str], timestamp: float | None = None
+    ) -> list[Any]:
+        """Read all intersection states from SUMO as canonical TrafficObservations."""
+        return [self.read_observation(iid, timestamp=timestamp) for iid in intersection_ids]
+
     @staticmethod
     def green_phase_queues(
         traci_connection: Any, intersection_id: str

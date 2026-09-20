@@ -33,3 +33,8 @@ class IntersectionTrafficState:
         result = asdict(self)
         result["signal_state"] = self.signal_state.value
         return result
+
+    def to_observation(self, source: str = "sumo", timestamp: float | None = None) -> Any:
+        """Convert this simulation traffic state to canonical TrafficObservation."""
+        from perception.models import TrafficObservation
+        return TrafficObservation.from_intersection_traffic_state(self, source=source, timestamp=timestamp)

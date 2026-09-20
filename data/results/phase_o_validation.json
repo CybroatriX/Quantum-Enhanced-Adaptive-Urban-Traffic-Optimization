@@ -1,0 +1,286 @@
+{
+  "phase": "Phase O",
+  "title": "End-to-End System Validation & Final Integration",
+  "validation_timestamp": 1789847823.5377462,
+  "test_records": [
+    {
+      "component": "Perception / Contract",
+      "scenario": "Canonical TrafficObservation Generation",
+      "status": "PASSED",
+      "runtime_seconds": 0.00019,
+      "observed_result": "Generated 4 validated TrafficObservations across J1-J4",
+      "error": null
+    },
+    {
+      "component": "MultiIntersectionController",
+      "scenario": "Baseline QUBO Exact Optimization",
+      "status": "PASSED",
+      "runtime_seconds": 0.0042,
+      "observed_result": "Optimized 4 intersections. J1 green=(40s, 22s)",
+      "error": null
+    },
+    {
+      "component": "Optimization / QAOA",
+      "scenario": "QAOA Multi-Intersection Sampling",
+      "status": "PASSED",
+      "runtime_seconds": 5.00115,
+      "observed_result": "Sampled valid timings for 4 junctions. J1 obj=1.774803",
+      "error": null
+    },
+    {
+      "component": "Dynamic Events",
+      "scenario": "Accident Event Adaptive Re-Optimization",
+      "status": "PASSED",
+      "runtime_seconds": 0.00022,
+      "observed_result": "J2 capacity throttled to 35%; signal status=event_adapted",
+      "error": null
+    },
+    {
+      "component": "Emergency Corridor",
+      "scenario": "Emergency Preemption Overriding Dynamic Event",
+      "status": "PASSED",
+      "runtime_seconds": 0.00012,
+      "observed_result": "Preemption active across J1-J4. J2 event preempted by ambulance.",
+      "error": null
+    },
+    {
+      "component": "Emergency Corridor",
+      "scenario": "Corridor Advancement and Release",
+      "status": "PASSED",
+      "runtime_seconds": 0.0004,
+      "observed_result": "Ambulance progressed past J2; corridor cleanly released.",
+      "error": null
+    },
+    {
+      "component": "Precedence Hierarchy",
+      "scenario": "Event Expiration & Baseline Resumption",
+      "status": "PASSED",
+      "runtime_seconds": 0.0008,
+      "observed_result": "Accident expired; all junctions cleanly returned to normal QUBO control.",
+      "error": null
+    },
+    {
+      "component": "Metrics / Environmental",
+      "scenario": "Network Aggregation & Stoichiometric CO2",
+      "status": "PASSED",
+      "runtime_seconds": 0.00027,
+      "observed_result": "Aggregated 4 junctions. Fuel=0.9719L, CO2=2324.42g",
+      "error": null
+    },
+    {
+      "component": "Real-World Prototype",
+      "scenario": "Perception -> Tracking -> Aggregation -> QUBO Signal Recommendation",
+      "status": "PASSED",
+      "runtime_seconds": 0.00173,
+      "observed_result": "Prototype signal recommendation: P0=40s, P2=22s",
+      "error": null
+    }
+  ],
+  "network_metrics_sample": {
+    "network_id": "urban_network",
+    "intersections_count": 4,
+    "total_vehicle_count": 73,
+    "network_total_waiting_time_seconds": 821.0,
+    "network_average_waiting_time_seconds": 11.247,
+    "network_total_queue": 57,
+    "network_average_queue": 14.25,
+    "network_max_queue": 6,
+    "network_throughput_vehicles_per_hour": 3420.0,
+    "network_average_travel_time_seconds": 26.255,
+    "network_total_fuel_consumption_litres": 0.9719,
+    "network_total_co2_emissions_grams": 2324.42,
+    "fuel_source": "simulation_proxy",
+    "co2_source": "simulation_proxy",
+    "intersection_metrics": {
+      "J1": {
+        "intersection_id": "J1",
+        "vehicle_count": 19,
+        "average_waiting_time_seconds": 10.58,
+        "total_waiting_time_seconds": 201.0,
+        "queue_length": 15,
+        "max_queue_length": 6,
+        "throughput_vehicles_per_hour": 900.0,
+        "average_travel_time_seconds": 25.58,
+        "fuel_consumption_litres": 0.2498,
+        "co2_emissions_grams": 597.4,
+        "fuel_source": "simulation_proxy",
+        "co2_source": "simulation_proxy",
+        "signal_changes_count": 0,
+        "approach_metrics": {
+          "north": {
+            "approach": "north",
+            "queue_length": 6,
+            "vehicle_count": 7,
+            "average_waiting_time_seconds": 9.43,
+            "throughput_vehicles_per_hour": 360.0
+          },
+          "south": {
+            "approach": "south",
+            "queue_length": 5,
+            "vehicle_count": 6,
+            "average_waiting_time_seconds": 9.17,
+            "throughput_vehicles_per_hour": 300.0
+          },
+          "east": {
+            "approach": "east",
+            "queue_length": 2,
+            "vehicle_count": 3,
+            "average_waiting_time_seconds": 13.33,
+            "throughput_vehicles_per_hour": 120.0
+          },
+          "west": {
+            "approach": "west",
+            "queue_length": 2,
+            "vehicle_count": 3,
+            "average_waiting_time_seconds": 13.33,
+            "throughput_vehicles_per_hour": 120.0
+          }
+        }
+      },
+      "J2": {
+        "intersection_id": "J2",
+        "vehicle_count": 19,
+        "average_waiting_time_seconds": 10.58,
+        "total_waiting_time_seconds": 201.0,
+        "queue_length": 15,
+        "max_queue_length": 6,
+        "throughput_vehicles_per_hour": 900.0,
+        "average_travel_time_seconds": 25.58,
+        "fuel_consumption_litres": 0.2498,
+        "co2_emissions_grams": 597.4,
+        "fuel_source": "simulation_proxy",
+        "co2_source": "simulation_proxy",
+        "signal_changes_count": 0,
+        "approach_metrics": {
+          "north": {
+            "approach": "north",
+            "queue_length": 2,
+            "vehicle_count": 3,
+            "average_waiting_time_seconds": 13.33,
+            "throughput_vehicles_per_hour": 120.0
+          },
+          "south": {
+            "approach": "south",
+            "queue_length": 2,
+            "vehicle_count": 3,
+            "average_waiting_time_seconds": 13.33,
+            "throughput_vehicles_per_hour": 120.0
+          },
+          "east": {
+            "approach": "east",
+            "queue_length": 6,
+            "vehicle_count": 7,
+            "average_waiting_time_seconds": 9.43,
+            "throughput_vehicles_per_hour": 360.0
+          },
+          "west": {
+            "approach": "west",
+            "queue_length": 5,
+            "vehicle_count": 6,
+            "average_waiting_time_seconds": 9.17,
+            "throughput_vehicles_per_hour": 300.0
+          }
+        }
+      },
+      "J3": {
+        "intersection_id": "J3",
+        "vehicle_count": 18,
+        "average_waiting_time_seconds": 13.33,
+        "total_waiting_time_seconds": 240.0,
+        "queue_length": 14,
+        "max_queue_length": 4,
+        "throughput_vehicles_per_hour": 840.0,
+        "average_travel_time_seconds": 28.33,
+        "fuel_consumption_litres": 0.249,
+        "co2_emissions_grams": 595.61,
+        "fuel_source": "simulation_proxy",
+        "co2_source": "simulation_proxy",
+        "signal_changes_count": 0,
+        "approach_metrics": {
+          "north": {
+            "approach": "north",
+            "queue_length": 4,
+            "vehicle_count": 5,
+            "average_waiting_time_seconds": 12.0,
+            "throughput_vehicles_per_hour": 240.0
+          },
+          "south": {
+            "approach": "south",
+            "queue_length": 4,
+            "vehicle_count": 5,
+            "average_waiting_time_seconds": 12.0,
+            "throughput_vehicles_per_hour": 240.0
+          },
+          "east": {
+            "approach": "east",
+            "queue_length": 3,
+            "vehicle_count": 4,
+            "average_waiting_time_seconds": 15.0,
+            "throughput_vehicles_per_hour": 180.0
+          },
+          "west": {
+            "approach": "west",
+            "queue_length": 3,
+            "vehicle_count": 4,
+            "average_waiting_time_seconds": 15.0,
+            "throughput_vehicles_per_hour": 180.0
+          }
+        }
+      },
+      "J4": {
+        "intersection_id": "J4",
+        "vehicle_count": 17,
+        "average_waiting_time_seconds": 10.53,
+        "total_waiting_time_seconds": 179.0,
+        "queue_length": 13,
+        "max_queue_length": 5,
+        "throughput_vehicles_per_hour": 780.0,
+        "average_travel_time_seconds": 25.53,
+        "fuel_consumption_litres": 0.2233,
+        "co2_emissions_grams": 534.01,
+        "fuel_source": "simulation_proxy",
+        "co2_source": "simulation_proxy",
+        "signal_changes_count": 0,
+        "approach_metrics": {
+          "north": {
+            "approach": "north",
+            "queue_length": 5,
+            "vehicle_count": 6,
+            "average_waiting_time_seconds": 9.17,
+            "throughput_vehicles_per_hour": 300.0
+          },
+          "south": {
+            "approach": "south",
+            "queue_length": 4,
+            "vehicle_count": 5,
+            "average_waiting_time_seconds": 8.8,
+            "throughput_vehicles_per_hour": 240.0
+          },
+          "east": {
+            "approach": "east",
+            "queue_length": 2,
+            "vehicle_count": 3,
+            "average_waiting_time_seconds": 13.33,
+            "throughput_vehicles_per_hour": 120.0
+          },
+          "west": {
+            "approach": "west",
+            "queue_length": 2,
+            "vehicle_count": 3,
+            "average_waiting_time_seconds": 13.33,
+            "throughput_vehicles_per_hour": 120.0
+          }
+        }
+      }
+    }
+  },
+  "latencies_seconds": {
+    "observation_creation_seconds": 0.00019320000137668103,
+    "qubo_exact_batch_seconds": 0.004203099997539539,
+    "qaoa_batch_seconds": 5.001152400000137,
+    "dynamic_event_registration_seconds": 0.0002179000002797693,
+    "emergency_corridor_request_seconds": 0.00012350000179139897,
+    "metrics_evaluation_seconds": 0.0002691000045160763,
+    "realworld_prototype_pipeline_seconds": 0.0017347000029985793
+  }
+}
