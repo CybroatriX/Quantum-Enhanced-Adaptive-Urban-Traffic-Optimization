@@ -261,6 +261,7 @@
     return ids;
   }
 
+<<<<<<< HEAD
   function routeCost(city, path, congestion = []) {
     return pathEdges(city, path).reduce((sum, edgeId) => {
       const edge = city.edges[edgeId];
@@ -341,6 +342,28 @@
       if (pick <= 0) return item.path;
     }
     return weighted.at(-1).path;
+=======
+  function diversePath(city, start, goal, blocked = new Set(), congestion = [], random = Math.random) {
+    const base = shortestPath(city, start, goal, blocked, congestion);
+    if (base.length < 2) return base;
+    const candidates = [base];
+    for (const edgeId of pathEdges(city, base)) {
+      const extraBlocked = new Set(blocked);
+      extraBlocked.add(city.edges[edgeId].key);
+      const alternative = shortestPath(city, start, goal, extraBlocked, congestion);
+      if (alternative.length > 1) candidates.push(alternative);
+    }
+    const unique = [...new Map(candidates.map(path => [path.join("-"), path])).values()];
+    const scored = unique.map(path => {
+      const cost = pathEdges(city, path).reduce((sum, edgeId) => {
+        const edge = city.edges[edgeId];
+        return sum + edge.length / edge.speed + Number(congestion[edgeId] || 0);
+      }, 0);
+      return { path, score: cost * (.92 + random() * .22) };
+    }).sort((a, b) => a.score - b.score);
+    const shortlist = scored.slice(0, Math.min(3, scored.length));
+    return shortlist[Math.floor(random() * shortlist.length)].path;
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
   }
 
   const ACCIDENT_FAR_DISTANCE = 140; // px: approach zone starts
@@ -419,6 +442,93 @@
   const EMERGENCY_CLEARANCE_DISTANCE = 55;  // px: distance ahead before beginning return
   const EMERGENCY_RETURN_DISTANCE = 55;     // px: distance ahead verified before returning to lane
 
+<<<<<<< HEAD
+=======
+  function directionColor(phase, dir) {
+    if (!phase) return "red";
+    const p = typeof phase === "string" ? phase : phase?.phase || "";
+    const d = String(dir || "").toUpperCase();
+
+    if (d === "NORTH" || d === "N") {
+      if (p === "NORTH_GREEN") return "green";
+      if (p === "NORTH_YELLOW") return "yellow";
+      return "red";
+    }
+    if (d === "SOUTH" || d === "S") {
+      if (p === "SOUTH_GREEN") return "green";
+      if (p === "SOUTH_YELLOW") return "yellow";
+      return "red";
+    }
+    if (d === "EAST" || d === "E") {
+      if (p === "EAST_GREEN") return "green";
+      if (p === "EAST_YELLOW") return "yellow";
+      return "red";
+    }
+    if (d === "WEST" || d === "W") {
+      if (p === "WEST_GREEN") return "green";
+      if (p === "WEST_YELLOW") return "yellow";
+      return "red";
+    }
+
+    if (p === `${d}_GREEN`) return "green";
+    if (p === `${d}_YELLOW`) return "yellow";
+    return "red";
+  }
+
+  function phaseColor(phase, axisOrDir) {
+    const d = String(axisOrDir || "").toUpperCase();
+    if (d === "NORTH" || d === "SOUTH" || d === "EAST" || d === "WEST" || d === "N" || d === "S" || d === "E" || d === "W") {
+      return directionColor(phase, d);
+    }
+    const p = typeof phase === "string" ? phase : phase?.phase || "";
+    if (d === "NS") {
+      if (p === "NORTH_GREEN" || p === "SOUTH_GREEN" || p === "NS_GREEN") return "green";
+      if (p === "NORTH_YELLOW" || p === "SOUTH_YELLOW" || p === "NS_YELLOW") return "yellow";
+      return "red";
+    }
+    if (d === "EW") {
+      if (p === "EAST_GREEN" || p === "WEST_GREEN" || p === "EW_GREEN") return "green";
+      if (p === "EAST_YELLOW" || p === "WEST_YELLOW" || p === "EW_YELLOW") return "yellow";
+      return "red";
+    }
+    return "red";
+  }
+
+  function isConflictingGreen(signal) {
+    const phase = typeof signal === "string" ? signal : signal?.phase;
+    if (!phase) return false;
+    const north = directionColor(phase, "NORTH");
+    const south = directionColor(phase, "SOUTH");
+    const east = directionColor(phase, "EAST");
+    const west = directionColor(phase, "WEST");
+
+    const greens = [north, south, east, west].filter(c => c === "green").length;
+    if (greens > 1) return true;
+
+    const yellows = [north, south, east, west].filter(c => c === "yellow").length;
+    if (yellows > 1) return true;
+
+    if (greens > 0 && yellows > 0) return true;
+
+    if (north === "green" && south === "green") return true;
+    if (east === "green" && west === "green") return true;
+
+    if (phase === "NORTH_GREEN" && (north !== "green" || south !== "red" || east !== "red" || west !== "red")) return true;
+    if (phase === "SOUTH_GREEN" && (south !== "green" || north !== "red" || east !== "red" || west !== "red")) return true;
+    if (phase === "EAST_GREEN" && (east !== "green" || north !== "red" || south !== "red" || west !== "red")) return true;
+    if (phase === "WEST_GREEN" && (west !== "green" || north !== "red" || south !== "red" || east !== "red")) return true;
+
+    if (phase === "NORTH_YELLOW" && (north !== "yellow" || south !== "red" || east !== "red" || west !== "red")) return true;
+    if (phase === "SOUTH_YELLOW" && (south !== "yellow" || north !== "red" || east !== "red" || west !== "red")) return true;
+    if (phase === "EAST_YELLOW" && (east !== "yellow" || north !== "red" || south !== "red" || west !== "red")) return true;
+    if (phase === "WEST_YELLOW" && (west !== "yellow" || north !== "red" || south !== "red" || east !== "red")) return true;
+
+    if (typeof phase === "string" && phase.startsWith("ALL_RED") && (north !== "red" || south !== "red" || east !== "red" || west !== "red")) return true;
+
+    return false;
+  }
+
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
   return {
     hashSeed,
     mulberry32,
@@ -427,9 +537,16 @@
     generateCity,
     shortestPath,
     diversePath,
+<<<<<<< HEAD
     candidatePaths,
     chooseRandomBoundaryPair,
     pathEdges,
+=======
+    pathEdges,
+    directionColor,
+    phaseColor,
+    isConflictingGreen,
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
     calculateAccidentSpeedProfile,
     ACCIDENT_FAR_DISTANCE,
     ACCIDENT_ZONE_RADIUS,

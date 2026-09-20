@@ -6,7 +6,16 @@ import logging
 from time import time
 from typing import Any, Mapping, Sequence, Union
 
+<<<<<<< HEAD
 from perception.models import TrafficObservation, VALID_VEHICLE_CLASSES, VehicleDetection
+=======
+from perception.models import (
+    PedestrianDetection,
+    TrafficObservation,
+    VALID_VEHICLE_CLASSES,
+    VehicleDetection,
+)
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
 from perception.queue_estimator import QueueEstimator
 
 logger = logging.getLogger(__name__)
@@ -141,6 +150,29 @@ class TrafficAggregator:
 
         return list(tracked.values()) + untracked
 
+<<<<<<< HEAD
+=======
+    def deduplicate_pedestrians(
+        self, detections: Sequence[PedestrianDetection]
+    ) -> list[PedestrianDetection]:
+        """Deduplicate pedestrian detections in a single frame.
+
+        If multiple detections share the same track_id, retain the detection with higher confidence.
+        """
+        tracked: dict[int, PedestrianDetection] = {}
+        untracked: list[PedestrianDetection] = []
+
+        for det in detections:
+            if det.track_id is None:
+                untracked.append(det)
+            else:
+                tid = det.track_id
+                if tid not in tracked or det.confidence > tracked[tid].confidence:
+                    tracked[tid] = det
+
+        return list(tracked.values()) + untracked
+
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
     def aggregate(
         self,
         detections: Sequence[VehicleDetection],
@@ -148,8 +180,20 @@ class TrafficAggregator:
         timestamp: float | None = None,
         source: str = "yolov8",
         frame_shape: tuple[int, int] | None = None,
+<<<<<<< HEAD
     ) -> TrafficObservation:
         """Aggregate vehicle detections into a structured TrafficObservation."""
+=======
+        pedestrian_detections: Sequence[PedestrianDetection] = (),
+        pedestrian_approach_regions: Mapping[str, Any] | None = None,
+    ) -> TrafficObservation:
+        """Aggregate vehicle and pedestrian detections into a structured TrafficObservation.
+
+        Vehicles and pedestrians are strictly separated:
+        - vehicle_count and class_counts include ONLY vehicles
+        - pedestrian_count and pedestrian_detections include ONLY pedestrians
+        """
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
         now = time() if timestamp is None else float(timestamp)
 
         # 1. Clean track history past TTL
@@ -157,8 +201,14 @@ class TrafficAggregator:
 
         # 2. Deduplicate within the frame
         clean_detections = self.deduplicate_detections(detections)
+<<<<<<< HEAD
 
         # 3. Initialize metrics
+=======
+        clean_pedestrians = self.deduplicate_pedestrians(pedestrian_detections)
+
+        # 3. Initialize metrics for vehicles
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
         class_counts: dict[str, int] = {k: 0 for k in sorted(VALID_VEHICLE_CLASSES)}
         approach_counts: dict[str, int] = {"north": 0, "south": 0, "east": 0, "west": 0}
         total_confidence = 0.0
@@ -180,6 +230,7 @@ class TrafficAggregator:
                     "approach": approach,
                 }
 
+<<<<<<< HEAD
         # Estimate queue lengths using velocity and tracking history
         queue_lengths = self.queue_estimator.estimate_queues(clean_detections, approaches, timestamp=now)
 
@@ -187,6 +238,44 @@ class TrafficAggregator:
         avg_confidence = round(total_confidence / vehicle_count, 4) if vehicle_count > 0 else 0.0
         tracked_count = len(frame_track_ids)
         tracking_available = tracked_count > 0 or len(self._seen_tracks) > 0
+=======
+        # 4. Initialize metrics for pedestrians
+        ped_approach_counts: dict[str, int] = {"north": 0, "south": 0, "east": 0, "west": 0}
+        ped_total_confidence = 0.0
+        frame_ped_track_ids: set[int] = set()
+
+        for ped in clean_pedestrians:
+            ped_total_confidence += ped.confidence
+            if ped.track_id is not None:
+                frame_ped_track_ids.add(ped.track_id)
+                self._seen_tracks[ped.track_id] = {
+                    "last_seen": now,
+                    "class_name": "person",
+                    "approach": "pedestrian",
+                }
+
+            # If directional pedestrian regions are provided, classify approach
+            if pedestrian_approach_regions:
+                # Custom pedestrian ROI classification if provided
+                ped_appr = self.classify_approach(ped.center[0], ped.center[1], frame_shape)
+                ped_approach_counts[ped_appr] = ped_approach_counts.get(ped_appr, 0) + 1
+
+        # Estimate queue lengths using velocity and tracking history (vehicles only)
+        queue_lengths = self.queue_estimator.estimate_queues(clean_detections, approaches, timestamp=now)
+
+        vehicle_count = len(clean_detections)
+        pedestrian_count = len(clean_pedestrians)
+        total_objects = vehicle_count + pedestrian_count
+
+        if total_objects > 0:
+            avg_confidence = round((total_confidence + ped_total_confidence) / total_objects, 4)
+        else:
+            avg_confidence = 0.0
+
+        tracked_count = len(frame_track_ids)
+        tracked_ped_count = len(frame_ped_track_ids)
+        tracking_available = (tracked_count + tracked_ped_count) > 0 or len(self._seen_tracks) > 0
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
 
         return TrafficObservation(
             timestamp=now,
@@ -200,6 +289,13 @@ class TrafficAggregator:
             tracking_available=tracking_available,
             tracked_vehicle_count=tracked_count,
             average_confidence=avg_confidence,
+<<<<<<< HEAD
+=======
+            pedestrian_count=pedestrian_count,
+            tracked_pedestrian_count=tracked_ped_count,
+            pedestrian_detections=tuple(clean_pedestrians),
+            pedestrian_approach_counts=ped_approach_counts,
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
         )
 
     def _prune_track_history(self, now: float) -> None:

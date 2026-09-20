@@ -23,6 +23,10 @@
         <span class="mission-tag">LIVE DIGITAL TWIN</span>
         <span class="system-health"><i></i><b id="backendStatus">LOCAL ENGINE</b></span>
         <span class="system-health" id="qaoaStatusBadge"><i style="background:var(--violet);box-shadow:0 0 10px var(--violet);"></i><b id="qaoaStatus">QAOA READY</b></span>
+<<<<<<< HEAD
+=======
+        <button id="topNavLiveDetectionBtn" class="topbar-live-btn" title="Open Real-time Vehicle & Pedestrian Camera Detection"><span class="pulse-dot"></span><span>📷 LIVE DETECTION</span></button>
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
       </div>
       <div class="header-actions">
         <div class="clock"><small>SIMULATION TIME</small><b id="simClock">00:00:00</b></div>
@@ -52,6 +56,18 @@
         <button id="generateBtn" class="primary wide">Regenerate scenario</button>
       </section>
 
+<<<<<<< HEAD
+=======
+      <section class="live-detection-jump-card">
+        <div class="eyebrow" style="color: #ff8e8e;">PERCEPTION LAB</div>
+        <h3 style="font-size: 0.82rem; margin: 2px 0 4px; color: #fff;">Real-Time Camera Detection</h3>
+        <p style="font-size: 0.60rem; color: var(--muted); margin-bottom: 8px;">Direct YOLOv8 webcam & video perception for vehicles and pedestrians.</p>
+        <button id="leftNavLiveDetectionBtn" class="primary wide" style="background: linear-gradient(135deg, rgba(255,107,107,0.85), rgba(255,75,43,0.85)); border-color: #ff6b6b; box-shadow: 0 0 12px rgba(255,107,107,0.3); font-weight: 800; cursor: pointer;">
+          📷 Open Live Detection Tab
+        </button>
+      </section>
+
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
       <section>
         <div class="section-title"><h2>Control strategy</h2><span id="controllerState">HYBRID QUBO</span></div>
         <label class="field-label" for="controllerSelect">Signal algorithm</label>
@@ -144,6 +160,10 @@
         <button id="tabMetricsBtn" class="tab-btn" data-tab="tabMetrics" role="tab" aria-selected="false">Metrics</button>
         <button id="tabResearchBtn" class="tab-btn" data-tab="tabResearch" role="tab" aria-selected="false">QAOA</button>
         <button id="tabRealworldBtn" class="tab-btn" data-tab="tabRealworld" role="tab" aria-selected="false">Real-World</button>
+<<<<<<< HEAD
+=======
+        <button id="tabRealtimeBtn" class="tab-btn" data-tab="tabRealtime" role="tab" aria-selected="false">📷 Live Detect</button>
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
       </div>
 
       <!-- TAB 1: Selected Junction & Signals -->
@@ -153,6 +173,7 @@
           <h3 id="junctionTitle">Harbor Gate</h3>
           <div class="signal-grid">
             <div class="approach-card">
+<<<<<<< HEAD
               <span>NORTH</span>
               <div class="traffic-light" id="nLight"><i class="red"></i><i class="yellow"></i><i class="green"></i></div>
               <b id="nSignalText">GREEN</b>
@@ -178,6 +199,21 @@
             </div>
           </div>
           <div class="phase-row"><span id="phaseLabel">N GREEN</span><b id="phaseTimer">16s</b></div>
+=======
+              <span>NORTH / SOUTH</span>
+              <div class="traffic-light" id="nsLight"><i class="red"></i><i class="yellow"></i><i class="green"></i></div>
+              <b id="nsSignalText">GREEN</b>
+              <small><span id="nsQueue">0</span> waiting</small>
+            </div>
+            <div class="approach-card">
+              <span>EAST / WEST</span>
+              <div class="traffic-light" id="ewLight"><i class="red"></i><i class="yellow"></i><i class="green"></i></div>
+              <b id="ewSignalText">RED</b>
+              <small><span id="ewQueue">0</span> waiting</small>
+            </div>
+          </div>
+          <div class="phase-row"><span id="phaseLabel">NS GREEN</span><b id="phaseTimer">30s</b></div>
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
           <div class="junction-facts"><span>Density <b id="junctionDensity">0%</b></span><span>Capacity <b id="junctionCapacity">0</b></span><span>Pedestrians <b id="junctionPedestrians">0</b></span></div>
 
           <div class="directional-strip" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-top: 8px; text-align: center;">
@@ -427,6 +463,209 @@
           <p id="rwRecommendationNote" style="font-size: 0.52rem; color: var(--muted); line-height: 1.35; margin-top: 6px;">Recommended green timing calculated via canonical QUBO formulation based on real-world perception queues.</p>
         </section>
       </div>
+<<<<<<< HEAD
+=======
+
+      <!-- TAB 8: Real-Time Detection (Vehicles + Pedestrians Live Dashboard) -->
+      <div id="tabRealtime" class="tab-pane hidden">
+        <section>
+          <div class="section-title">
+            <h2>Live Detection</h2>
+            <span id="rtModeBadge" style="background: rgba(255,100,124,.18); color: var(--red); font-size: 0.52rem; padding: 2px 6px; border-radius: 4px; font-weight: 700; border: 1px solid rgba(255,100,124,.35);">DETECTION ONLY</span>
+          </div>
+
+          <!-- Status Indicators -->
+          <div class="rt-status-bar" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin: 6px 0 8px; text-align: center; font-size: 0.54rem;">
+            <div style="background: rgba(14,26,39,.7); padding: 4px 2px; border-radius: 4px; border: 1px solid var(--line);">
+              <span style="color: var(--muted); display: block; font-size: 0.48rem;">CAMERA</span>
+              <b id="rtCamStatusText" style="color: var(--amber);">STANDBY</b>
+            </div>
+            <div style="background: rgba(14,26,39,.7); padding: 4px 2px; border-radius: 4px; border: 1px solid var(--line);">
+              <span style="color: var(--muted); display: block; font-size: 0.48rem;">YOLOV8</span>
+              <b id="rtYoloStatusText" style="color: var(--mint);">READY</b>
+            </div>
+            <div style="background: rgba(14,26,39,.7); padding: 4px 2px; border-radius: 4px; border: 1px solid var(--line);">
+              <span style="color: var(--muted); display: block; font-size: 0.48rem;">TRACKING</span>
+              <b id="rtTrackingStatusText" style="color: var(--cyan);">ACTIVE</b>
+            </div>
+            <div style="background: rgba(14,26,39,.7); padding: 4px 2px; border-radius: 4px; border: 1px solid rgba(255,100,124,.3);">
+              <span style="color: var(--muted); display: block; font-size: 0.48rem;">SIGNAL CTRL</span>
+              <b style="color: var(--red);">DISABLED</b>
+            </div>
+          </div>
+
+          <!-- Controls Card -->
+          <div class="rt-controls-card" style="background: rgba(14,26,39,.6); border: 1px solid var(--line); border-radius: 6px; padding: 8px; margin-bottom: 8px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+              <div>
+                <label class="field-label" for="rtSourceSelect">Input Source</label>
+                <select id="rtSourceSelect" style="width: 100%; box-sizing: border-box; background: rgba(14,26,39,.8); border: 1px solid var(--line); color: #fff; padding: 4px; border-radius: 4px; font-size: 0.62rem;">
+                  <option value="camera-0" selected>Webcam 0 (Primary)</option>
+                  <option value="camera-1">Webcam 1</option>
+                  <option value="video-sample">Sample Traffic Video</option>
+                  <option value="video-custom">Custom Video Path</option>
+                </select>
+              </div>
+              <div>
+                <label class="field-label" for="rtIntersectionSelect">Target Junction</label>
+                <select id="rtIntersectionSelect" style="width: 100%; box-sizing: border-box; background: rgba(14,26,39,.8); border: 1px solid var(--line); color: #fff; padding: 4px; border-radius: 4px; font-size: 0.62rem;">
+                  <option value="J1" selected>J1 — Junction 1</option>
+                  <option value="J2">J2 — Junction 2</option>
+                  <option value="J3">J3 — Junction 3</option>
+                  <option value="J4">J4 — Junction 4</option>
+                </select>
+              </div>
+            </div>
+
+            <div id="rtCustomPathGroup" style="margin-top: 6px; display: none;">
+              <label class="field-label" for="rtCustomPathInput">Video File Path</label>
+              <input id="rtCustomPathInput" type="text" placeholder="e.g. data/traffic_sample.mp4" style="width: 100%; box-sizing: border-box; background: rgba(14,26,39,.8); border: 1px solid var(--line); color: #fff; padding: 5px; border-radius: 4px; font-size: 0.62rem;">
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 6px; margin-top: 6px; align-items: center;">
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.58rem; color: var(--muted); margin-bottom: 2px;">
+                  <span>Confidence</span>
+                  <b id="rtConfValueDisplay" style="color: var(--cyan);">35%</b>
+                </div>
+                <input id="rtConfidenceSlider" type="range" min="0.10" max="0.90" step="0.05" value="0.35" style="width: 100%; cursor: pointer;">
+              </div>
+              <div>
+                <label class="field-label" for="rtInferenceFpsSelect">Inference Rate</label>
+                <select id="rtInferenceFpsSelect" style="width: 100%; box-sizing: border-box; background: rgba(14,26,39,.8); border: 1px solid var(--line); color: #fff; padding: 4px; border-radius: 4px; font-size: 0.62rem;">
+                  <option value="5">5 FPS</option>
+                  <option value="10" selected>10 FPS</option>
+                  <option value="15">15 FPS</option>
+                  <option value="30">30 FPS</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="action-btn-row" style="display: flex; gap: 6px; margin-top: 8px;">
+              <button id="btnStartRealtime" class="primary wide" style="background: linear-gradient(135deg, #0ea5e9, #0284c7);">▶ Start Camera</button>
+              <button id="btnStopRealtime" class="secondary wide">⏹ Stop</button>
+            </div>
+          </div>
+
+          <!-- Live Camera Viewport -->
+          <div class="section-title" style="margin-top: 6px;">
+            <h2>Live Camera View</h2>
+            <span id="rtFpsDisplay" style="font-size: 0.52rem; color: var(--mint);">0.0 FPS</span>
+          </div>
+
+          <div id="rtVideoViewport" style="position: relative; width: 100%; aspect-ratio: 16/9; background: #070d17; border-radius: 6px; overflow: hidden; border: 1px solid var(--line); display: flex; align-items: center; justify-content: center;">
+            <img id="rtLiveStreamImg" src="" alt="Real-Time Detection Feed" style="width: 100%; height: 100%; object-fit: contain; display: none;">
+            <div id="rtStreamPlaceholder" style="text-align: center; padding: 12px; color: var(--muted);">
+              <div style="font-size: 1.8rem; margin-bottom: 4px; opacity: 0.6;">📷</div>
+              <b id="rtPlaceholderTitle" style="display: block; font-size: 0.68rem; color: #fff;">CAMERA STANDBY</b>
+              <small id="rtPlaceholderSubtitle" style="display: block; font-size: 0.55rem; color: #7f95a8; margin-top: 2px;">Select source and click Start Camera</small>
+            </div>
+            <div id="rtStreamErrorBox" style="position: absolute; inset: 0; background: rgba(15,23,42,.92); display: none; flex-direction: column; align-items: center; justify-content: center; padding: 12px; text-align: center;">
+              <b style="color: var(--red); font-size: 0.72rem; margin-bottom: 4px;">CAMERA UNAVAILABLE</b>
+              <p id="rtStreamErrorMsg" style="color: var(--muted); font-size: 0.55rem; margin: 0 0 6px;">Device not connected or failed to start.</p>
+              <button id="btnDismissRtError" class="secondary" style="font-size: 0.55rem; padding: 2px 8px;">Dismiss</button>
+            </div>
+          </div>
+
+          <!-- Real-Time Traffic Counts -->
+          <div class="section-title" style="margin-top: 10px;">
+            <h2>Live Traffic Counts</h2>
+            <span style="font-size: 0.52rem; color: var(--muted);">CONTINUOUS</span>
+          </div>
+
+          <!-- Primary Hero Metric Cards -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 4px;">
+            <div style="background: rgba(86,199,255,.08); border: 1px solid rgba(86,199,255,.3); border-radius: 6px; padding: 8px; text-align: center;">
+              <small style="display: block; font-size: 0.55rem; font-weight: 700; color: var(--cyan); letter-spacing: 0.05em;">TOTAL VEHICLES</small>
+              <b id="rtHeroVehicleCount" style="font-size: 1.6rem; color: #fff; line-height: 1.2;">0</b>
+            </div>
+            <div style="background: rgba(244,63,94,.1); border: 1px solid rgba(244,63,94,.35); border-radius: 6px; padding: 8px; text-align: center;">
+              <small style="display: block; font-size: 0.55rem; font-weight: 700; color: #f43f5e; letter-spacing: 0.05em;">TOTAL PEDESTRIANS</small>
+              <b id="rtHeroPedestrianCount" style="font-size: 1.6rem; color: #fff; line-height: 1.2;">0</b>
+            </div>
+          </div>
+
+          <!-- Vehicle Classes Breakdown -->
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-top: 6px; text-align: center;">
+            <div style="background: rgba(14,26,39,.65); padding: 5px 2px; border-radius: 4px; border: 1px solid var(--line);">
+              <small style="display: block; font-size: 0.50rem; color: var(--muted);">CARS</small>
+              <b id="rtCountCar" style="font-size: 0.82rem; color: #fff;">0</b>
+            </div>
+            <div style="background: rgba(14,26,39,.65); padding: 5px 2px; border-radius: 4px; border: 1px solid var(--line);">
+              <small style="display: block; font-size: 0.50rem; color: var(--muted);">M-CYCLES</small>
+              <b id="rtCountMoto" style="font-size: 0.82rem; color: #fff;">0</b>
+            </div>
+            <div style="background: rgba(14,26,39,.65); padding: 5px 2px; border-radius: 4px; border: 1px solid var(--line);">
+              <small style="display: block; font-size: 0.50rem; color: var(--muted);">BUSES</small>
+              <b id="rtCountBus" style="font-size: 0.82rem; color: #fff;">0</b>
+            </div>
+            <div style="background: rgba(14,26,39,.65); padding: 5px 2px; border-radius: 4px; border: 1px solid var(--line);">
+              <small style="display: block; font-size: 0.50rem; color: var(--muted);">TRUCKS</small>
+              <b id="rtCountTruck" style="font-size: 0.82rem; color: #fff;">0</b>
+            </div>
+          </div>
+
+          <!-- Tracking & Confidence Strip -->
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; padding: 6px 8px; background: rgba(14,26,39,.5); border-radius: 4px; border: 1px solid var(--line); font-size: 0.58rem;">
+            <span>Tracked Entities: <b id="rtTotalTracked" style="color: var(--mint);">0</b></span>
+            <span>Avg Confidence: <b id="rtConfidencePercent" style="color: var(--cyan);">0.0%</b></span>
+          </div>
+
+          <!-- Approach / Region Statistics -->
+          <div style="margin-top: 8px;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.54rem; color: var(--muted); margin-bottom: 3px;">
+              <span>APPROACH REGIONS</span>
+              <span>NORTH / SOUTH / EAST / WEST</span>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; text-align: center;">
+              <div style="background: rgba(14,26,39,.6); padding: 4px; border-radius: 4px; border: 1px solid var(--line);">
+                <small style="display: block; font-size: 0.48rem; color: var(--muted);">NORTH</small>
+                <span style="font-size: 0.65rem; color: var(--cyan);">🚗 <b id="rtApprVehNorth">0</b></span>
+                <span style="display: block; font-size: 0.55rem; color: #f43f5e;">🚶 <b id="rtApprPedNorth">0</b></span>
+              </div>
+              <div style="background: rgba(14,26,39,.6); padding: 4px; border-radius: 4px; border: 1px solid var(--line);">
+                <small style="display: block; font-size: 0.48rem; color: var(--muted);">SOUTH</small>
+                <span style="font-size: 0.65rem; color: var(--cyan);">🚗 <b id="rtApprVehSouth">0</b></span>
+                <span style="display: block; font-size: 0.55rem; color: #f43f5e;">🚶 <b id="rtApprPedSouth">0</b></span>
+              </div>
+              <div style="background: rgba(14,26,39,.6); padding: 4px; border-radius: 4px; border: 1px solid var(--line);">
+                <small style="display: block; font-size: 0.48rem; color: var(--muted);">EAST</small>
+                <span style="font-size: 0.65rem; color: var(--mint);">🚗 <b id="rtApprVehEast">0</b></span>
+                <span style="display: block; font-size: 0.55rem; color: #f43f5e;">🚶 <b id="rtApprPedEast">0</b></span>
+              </div>
+              <div style="background: rgba(14,26,39,.6); padding: 4px; border-radius: 4px; border: 1px solid var(--line);">
+                <small style="display: block; font-size: 0.48rem; color: var(--muted);">WEST</small>
+                <span style="font-size: 0.65rem; color: var(--mint);">🚗 <b id="rtApprVehWest">0</b></span>
+                <span style="display: block; font-size: 0.55rem; color: #f43f5e;">🚶 <b id="rtApprPedWest">0</b></span>
+              </div>
+            </div>
+            <div id="rtPedRoiMessage" style="font-size: 0.50rem; color: #7f95a8; margin-top: 3px; font-style: italic;">
+              Directional pedestrian ROI not configured (showing total pedestrian count above)
+            </div>
+          </div>
+
+          <!-- Prototype Queue Estimate -->
+          <div id="rtQueueSection" style="margin-top: 8px; padding: 6px 8px; background: rgba(14,26,39,.5); border-radius: 4px; border: 1px solid var(--line);">
+            <div style="display: flex; justify-content: space-between; font-size: 0.52rem; color: var(--amber); font-weight: 700;">
+              <span>PROTOTYPE QUEUE ESTIMATE</span>
+              <span id="rtQueueActiveState">INACTIVE</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-top: 4px; font-size: 0.58rem; color: var(--muted);">
+              <span>N: <b id="rtQueueN" style="color: #fff;">0</b></span>
+              <span>S: <b id="rtQueueS" style="color: #fff;">0</b></span>
+              <span>E: <b id="rtQueueE" style="color: #fff;">0</b></span>
+              <span>W: <b id="rtQueueW" style="color: #fff;">0</b></span>
+            </div>
+          </div>
+
+          <!-- Strict Safety Notice -->
+          <div style="margin-top: 10px; padding: 6px 8px; background: rgba(255,100,124,.1); border-left: 3px solid var(--red); border-radius: 0 4px 4px 0; font-size: 0.52rem; color: #dbe9ef; line-height: 1.35;">
+            <b style="color: var(--red); display: block; margin-bottom: 2px;">SIGNAL CONTROL: DISABLED — DETECTION ONLY MODE</b>
+            Real-time camera perception runs in observer mode. Detections do NOT actuate signal timings or invoke QUBO/QAOA optimization.
+          </div>
+        </section>
+      </div>
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
     </aside>
   </div>
 

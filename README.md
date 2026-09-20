@@ -81,7 +81,11 @@
 git clone https://github.com/CybroatriX/Quantum-Enhanced-Adaptive-Urban-Traffic-Optimization.git
 cd Quantum-Enhanced-Adaptive-Urban-Traffic-Optimization-1
 
+<<<<<<< HEAD
 # Set up Python virtual environment
+=======
+# Set u`p Python virtual environment
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip

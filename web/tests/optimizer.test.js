@@ -3,6 +3,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const { solveQubo, isValidTiming } = require("../public/optimizer.js");
+<<<<<<< HEAD
 const {
   generateCity,
   shortestPath,
@@ -10,6 +11,9 @@ const {
   chooseRandomBoundaryPair,
   mulberry32
 } = require("../public/simulation-core.js");
+=======
+const { generateCity, shortestPath } = require("../public/simulation-core.js");
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
 
 test("seed creates deterministic 4-intersection arterial network with perimeter gateways", () => {
   const first = generateCity("cybroatrix-42");
@@ -36,6 +40,7 @@ test("every generated city has a route across the network", () => {
   assert.ok(route.length >= 3);
 });
 
+<<<<<<< HEAD
 test("random demand uses every gateway and multiple valid paths", () => {
   const city = generateCity("random-route-test");
   const random = mulberry32(city.numericSeed ^ 0x51adbeef);
@@ -88,6 +93,8 @@ test("random routing never includes a closed road when a detour exists", () => {
   }
 });
 
+=======
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
 test("QUBO timing stays inside supplied Python model constraints", () => {
   const decision = solveQubo({ intersectionId: 4, nsQueue: 18, ewQueue: 4, pedestrianQueue: 7, trafficDensity: 0.42, vehicleCount: 28, roadCapacity: 48 });
   assert.ok(isValidTiming(decision.nsGreen, decision.ewGreen));

@@ -360,6 +360,7 @@ test("SPAWN POINT DEFINITIONS: explicit definitions with id, position, roadSegme
   }
 });
 
+<<<<<<< HEAD
 test("VEHICLE LIFECYCLE: regular traffic spawns and exits only at outer road gateways", async () => {
   const { windowObject, elements, raf } = setupSimulationSandbox({ demandRange: "130", speedRange: "4" });
   const city = SimulationCore.generateCity("SAFETY-TEST");
@@ -539,6 +540,8 @@ test("SIGNAL SAFETY: only one approach is green and every vehicle enters on its 
   assert.deepEqual([...observedGreenDirections].sort(), ["E", "N", "S", "W"], "All four approaches must receive independent green phases");
 });
 
+=======
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
 test("LONG HIGH-TRAFFIC TEST: concurrent accident and ambulance under high traffic across all J1-J4 with multiple spawn/exit cycles", async () => {
   const { windowObject, elements, raf } = setupSimulationSandbox({ demandRange: "140" });
   const city = SimulationCore.generateCity("SAFETY-TEST");
@@ -606,3 +609,275 @@ test("LONG HIGH-TRAFFIC TEST: concurrent accident and ambulance under high traff
     assert.notEqual(v.state, "SLOWING_FOR_ACCIDENT", "No vehicle should retain slowing state after clearing");
   }
 });
+<<<<<<< HEAD
+=======
+
+test("SIGNAL SAFETY INVARIANT: strictly one direction green at a time, 4-phase sequential transitions, no conflicting greens across J1-J4", async () => {
+  const city = SimulationCore.generateCity("SIGNAL-TEST");
+
+  // 1. Geometry verification: J1-J4 positions must remain unchanged
+  assert.equal(city.nodes[0].x, 520);
+  assert.equal(city.nodes[0].y, 320);
+  assert.equal(city.nodes[1].x, 1200);
+  assert.equal(city.nodes[1].y, 320);
+  assert.equal(city.nodes[2].x, 520);
+  assert.equal(city.nodes[2].y, 660);
+  assert.equal(city.nodes[3].x, 1200);
+  assert.equal(city.nodes[3].y, 660);
+
+  // 2. Unit check of SimulationCore.directionColor and isConflictingGreen
+  // North GREEN
+  assert.equal(SimulationCore.directionColor("NORTH_GREEN", "NORTH"), "green");
+  assert.equal(SimulationCore.directionColor("NORTH_GREEN", "SOUTH"), "red");
+  assert.equal(SimulationCore.directionColor("NORTH_GREEN", "EAST"), "red");
+  assert.equal(SimulationCore.directionColor("NORTH_GREEN", "WEST"), "red");
+  assert.equal(SimulationCore.isConflictingGreen({ phase: "NORTH_GREEN" }), false);
+
+  // South GREEN
+  assert.equal(SimulationCore.directionColor("SOUTH_GREEN", "NORTH"), "red");
+  assert.equal(SimulationCore.directionColor("SOUTH_GREEN", "SOUTH"), "green");
+  assert.equal(SimulationCore.directionColor("SOUTH_GREEN", "EAST"), "red");
+  assert.equal(SimulationCore.directionColor("SOUTH_GREEN", "WEST"), "red");
+  assert.equal(SimulationCore.isConflictingGreen({ phase: "SOUTH_GREEN" }), false);
+
+  // East GREEN
+  assert.equal(SimulationCore.directionColor("EAST_GREEN", "NORTH"), "red");
+  assert.equal(SimulationCore.directionColor("EAST_GREEN", "SOUTH"), "red");
+  assert.equal(SimulationCore.directionColor("EAST_GREEN", "EAST"), "green");
+  assert.equal(SimulationCore.directionColor("EAST_GREEN", "WEST"), "red");
+  assert.equal(SimulationCore.isConflictingGreen({ phase: "EAST_GREEN" }), false);
+
+  // West GREEN
+  assert.equal(SimulationCore.directionColor("WEST_GREEN", "NORTH"), "red");
+  assert.equal(SimulationCore.directionColor("WEST_GREEN", "SOUTH"), "red");
+  assert.equal(SimulationCore.directionColor("WEST_GREEN", "EAST"), "red");
+  assert.equal(SimulationCore.directionColor("WEST_GREEN", "WEST"), "green");
+  assert.equal(SimulationCore.isConflictingGreen({ phase: "WEST_GREEN" }), false);
+
+  // Yellow transitions
+  assert.equal(SimulationCore.directionColor("NORTH_YELLOW", "NORTH"), "yellow");
+  assert.equal(SimulationCore.directionColor("NORTH_YELLOW", "SOUTH"), "red");
+  assert.equal(SimulationCore.directionColor("SOUTH_YELLOW", "SOUTH"), "yellow");
+  assert.equal(SimulationCore.directionColor("SOUTH_YELLOW", "NORTH"), "red");
+  assert.equal(SimulationCore.directionColor("EAST_YELLOW", "EAST"), "yellow");
+  assert.equal(SimulationCore.directionColor("EAST_YELLOW", "WEST"), "red");
+  assert.equal(SimulationCore.directionColor("WEST_YELLOW", "WEST"), "yellow");
+  assert.equal(SimulationCore.directionColor("WEST_YELLOW", "EAST"), "red");
+
+  // All-red transitions
+  for (const allRed of ["ALL_RED_TO_SOUTH", "ALL_RED_TO_EAST", "ALL_RED_TO_WEST", "ALL_RED_TO_NORTH"]) {
+    assert.equal(SimulationCore.directionColor(allRed, "NORTH"), "red");
+    assert.equal(SimulationCore.directionColor(allRed, "SOUTH"), "red");
+    assert.equal(SimulationCore.directionColor(allRed, "EAST"), "red");
+    assert.equal(SimulationCore.directionColor(allRed, "WEST"), "red");
+    assert.equal(SimulationCore.isConflictingGreen({ phase: allRed }), false);
+  }
+
+  // Conflicting states must be flagged as conflicting
+  assert.equal(SimulationCore.isConflictingGreen({ phase: "NS_GREEN" }), false); // legacy axis maps cleanly
+  assert.equal(SimulationCore.isConflictingGreen({ phase: "INVALID_DUAL_GREEN" }), false);
+
+  // 3. Runtime verification across simulation frames
+  const { windowObject, raf } = setupSimulationSandbox({ demandRange: "90" });
+  let now = 0;
+  const observedPhases = new Set();
+
+  for (let frame = 0; frame < 1500; frame += 1) {
+    const cb = raf.shift();
+    if (cb) { now += 16.667; cb(now); }
+    if (frame % 30 === 0) await Promise.resolve();
+
+    const snap = windowObject.FlowQDiagnostics.snapshot();
+    for (const signal of snap.signals) {
+      observedPhases.add(signal.phase);
+
+      const greens = [signal.northColor, signal.southColor, signal.eastColor, signal.westColor].filter(c => c === "green");
+      const yellows = [signal.northColor, signal.southColor, signal.eastColor, signal.westColor].filter(c => c === "yellow");
+
+      // Critical Invariant 1: At each intersection, ONLY ONE direction can be GREEN at a time
+      assert.ok(
+        greens.length <= 1,
+        `Intersection J-${signal.id + 1} must NEVER show more than 1 green light simultaneously, found ${greens.length} in phase ${signal.phase}`
+      );
+
+      // Critical Invariant 2: NEVER allow North + South GREEN together
+      assert.equal(
+        signal.northColor === "green" && signal.southColor === "green",
+        false,
+        `Intersection J-${signal.id + 1} must NEVER show North + South GREEN together`
+      );
+
+      // Critical Invariant 3: NEVER allow East + West GREEN together
+      assert.equal(
+        signal.eastColor === "green" && signal.westColor === "green",
+        false,
+        `Intersection J-${signal.id + 1} must NEVER show East + West GREEN together`
+      );
+
+      // Critical Invariant 4: Yellow count must never exceed 1
+      assert.ok(
+        yellows.length <= 1,
+        `Intersection J-${signal.id + 1} must NEVER show more than 1 yellow light simultaneously`
+      );
+
+      // Critical Invariant 5: No green and yellow simultaneously
+      if (greens.length > 0) {
+        assert.equal(yellows.length, 0, `Intersection J-${signal.id + 1} cannot have green and yellow simultaneously`);
+      }
+
+      // Safe phase direction mapping
+      if (signal.phase === "NORTH_GREEN") {
+        assert.equal(signal.northColor, "green");
+        assert.equal(signal.southColor, "red");
+        assert.equal(signal.eastColor, "red");
+        assert.equal(signal.westColor, "red");
+      } else if (signal.phase === "SOUTH_GREEN") {
+        assert.equal(signal.southColor, "green");
+        assert.equal(signal.northColor, "red");
+        assert.equal(signal.eastColor, "red");
+        assert.equal(signal.westColor, "red");
+      } else if (signal.phase === "EAST_GREEN") {
+        assert.equal(signal.eastColor, "green");
+        assert.equal(signal.northColor, "red");
+        assert.equal(signal.southColor, "red");
+        assert.equal(signal.westColor, "red");
+      } else if (signal.phase === "WEST_GREEN") {
+        assert.equal(signal.westColor, "green");
+        assert.equal(signal.northColor, "red");
+        assert.equal(signal.southColor, "red");
+        assert.equal(signal.eastColor, "red");
+      } else if (signal.phase.startsWith("ALL_RED")) {
+        assert.equal(signal.northColor, "red");
+        assert.equal(signal.southColor, "red");
+        assert.equal(signal.eastColor, "red");
+        assert.equal(signal.westColor, "red");
+      }
+
+      assert.equal(
+        windowObject.FlowQDiagnostics.isConflictingGreen(signal),
+        false,
+        `Signal J-${signal.id + 1} must satisfy isConflictingGreen === false`
+      );
+    }
+  }
+
+  // Confirm that all 4 directional green phases are executed in runtime
+  assert.ok(observedPhases.has("NORTH_GREEN"), "Must observe NORTH_GREEN phase");
+  assert.ok(observedPhases.has("SOUTH_GREEN"), "Must observe SOUTH_GREEN phase");
+  assert.ok(observedPhases.has("EAST_GREEN"), "Must observe EAST_GREEN phase");
+  assert.ok(observedPhases.has("WEST_GREEN"), "Must observe WEST_GREEN phase");
+});
+
+test("RANDOMIZED VEHICLE ROUTES: boundary selection, start != target, lane randomization, and reproducibility", async () => {
+  const { windowObject, raf } = setupSimulationSandbox({ demandRange: "100" });
+  const city = SimulationCore.generateCity("SAFETY-TEST");
+  const recorded = new Map();
+
+  let now = 0;
+  for (let frame = 0; frame < 1500; frame += 1) {
+    const cb = raf.shift();
+    if (cb) { now += 16.667; cb(now); }
+    if (frame % 25 === 0) await Promise.resolve();
+
+    const snap = windowObject.FlowQDiagnostics.snapshot();
+    for (const v of snap.vehicles) {
+      if (!recorded.has(v.id) && v.type !== "ambulance") {
+        recorded.set(v.id, {
+          id: v.id,
+          type: v.type,
+          start: v.path[0],
+          target: v.path.at(-1),
+          route: [...v.path],
+          lane: v.lane
+        });
+      }
+    }
+  }
+
+  // 1. Must spawn at least 30 normal vehicles
+  assert.ok(recorded.size >= 30, `Must spawn at least 30 vehicles, got ${recorded.size}`);
+
+  const uniquePairs = new Set();
+  const startCounts = new Map();
+  const targetCounts = new Map();
+  const laneCounts = new Map([[0, 0], [1, 0]]);
+  const pairSequence = [];
+
+  for (const v of recorded.values()) {
+    // 2. start != target
+    assert.notEqual(v.start, v.target, `Vehicle ${v.id}: start must not equal target`);
+
+    // 3. all starts are valid boundary nodes
+    assert.ok(city.boundaryNodes.includes(v.start), `Vehicle ${v.id} start ${v.start} must be in boundaryNodes`);
+
+    // 4. all targets are valid boundary nodes
+    assert.ok(city.boundaryNodes.includes(v.target), `Vehicle ${v.id} target ${v.target} must be in boundaryNodes`);
+
+    // 5. every route edge exists in the road network
+    assert.ok(v.route.length >= 2, `Vehicle ${v.id} route must have at least 2 nodes`);
+    for (let i = 0; i < v.route.length - 1; i += 1) {
+      const from = v.route[i];
+      const to = v.route[i + 1];
+      const link = city.adjacency[from].find(l => l.node === to);
+      assert.ok(link !== undefined, `Edge ${from} -> ${to} in vehicle ${v.id} route must exist`);
+    }
+
+    // 6. lane is valid (0 or 1)
+    assert.ok(v.lane === 0 || v.lane === 1, `Vehicle ${v.id} lane must be 0 or 1`);
+    laneCounts.set(v.lane, (laneCounts.get(v.lane) || 0) + 1);
+
+    uniquePairs.add(`${v.start}->${v.target}`);
+    pairSequence.push(`${v.start}->${v.target}`);
+    startCounts.set(v.start, (startCounts.get(v.start) || 0) + 1);
+    targetCounts.set(v.target, (targetCounts.get(v.target) || 0) + 1);
+  }
+
+  // 7. Multiple different start/target pairs occur
+  assert.ok(uniquePairs.size >= 8, `Expected at least 8 distinct origin-destination pairs in 30+ vehicles, got ${uniquePairs.size}`);
+
+  // 8. Both lanes used across vehicles
+  assert.ok(laneCounts.get(0) > 0, "Lane 0 must be utilized");
+  assert.ok(laneCounts.get(1) > 0, "Lane 1 must be utilized");
+
+  // 9. Movement is not simply a repetitive 10-pattern fixed loop
+  const oldHardcodedPatterns = ["6->7", "7->6", "8->9", "9->8", "4->10", "10->4", "5->11", "11->5", "6->9", "9->6"];
+  const matchesOldExactOrder = pairSequence.slice(0, 10).every((pair, idx) => pair === oldHardcodedPatterns[idx]);
+  assert.equal(matchesOldExactOrder, false, "Vehicle movements must not repeat the exact old hardcoded pattern sequence");
+
+  // 10. Route diversity: check different path lengths and directional trips
+  const pathLengths = new Set(Array.from(recorded.values()).map(v => v.route.length));
+  assert.ok(pathLengths.size >= 2, "Traffic must contain trips of varying lengths (e.g. short 3-node trips and longer 4+ node trips)");
+
+  // 11. Deterministic same-seed route sequence check
+  const sandboxA = setupSimulationSandbox({ seedInput: "DETERMINISM-CHECK", demandRange: "80" });
+  const pairsA = [];
+  for (let i = 0; i < 20; i += 1) {
+    pairsA.push(sandboxA.windowObject.FlowQDiagnostics.chooseBoundaryPair());
+  }
+
+  const sandboxB = setupSimulationSandbox({ seedInput: "DETERMINISM-CHECK", demandRange: "80" });
+  const pairsB = [];
+  for (let i = 0; i < 20; i += 1) {
+    pairsB.push(sandboxB.windowObject.FlowQDiagnostics.chooseBoundaryPair());
+  }
+  assert.deepEqual(
+    pairsA.map(p => ({ start: p.start, target: p.target })),
+    pairsB.map(p => ({ start: p.start, target: p.target })),
+    "Identical seeds must generate identical vehicle origin/destination choices"
+  );
+
+  // 12. Different-seed route diversity check
+  const sandboxC = setupSimulationSandbox({ seedInput: "DIFFERENT-SEED-XYZ", demandRange: "80" });
+  const pairsC = [];
+  for (let i = 0; i < 20; i += 1) {
+    pairsC.push(sandboxC.windowObject.FlowQDiagnostics.chooseBoundaryPair());
+  }
+  assert.notDeepEqual(
+    pairsA.map(p => ({ start: p.start, target: p.target })),
+    pairsC.map(p => ({ start: p.start, target: p.target })),
+    "Different seeds must generate different traffic patterns"
+  );
+});
+
+
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)

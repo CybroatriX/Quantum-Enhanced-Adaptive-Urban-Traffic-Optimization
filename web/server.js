@@ -268,6 +268,51 @@ async function handleApi(request, response, url) {
       });
     }
   }
+<<<<<<< HEAD
+=======
+  if (url.pathname === "/api/perception/live/stream") {
+    const streamUrl = `${pythonOptimizerUrl}/api/perception/live/stream`;
+    const parsed = new URL(streamUrl);
+    const proxyReq = http.request(
+      {
+        hostname: parsed.hostname,
+        port: parsed.port,
+        path: parsed.pathname,
+        method: "GET",
+        headers: { Accept: "multipart/x-mixed-replace, image/jpeg, */*" }
+      },
+      proxyRes => {
+        response.writeHead(proxyRes.statusCode || 200, {
+          "Content-Type": proxyRes.headers["content-type"] || "multipart/x-mixed-replace; boundary=frame",
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+          Connection: "close",
+          Pragma: "no-cache"
+        });
+        proxyRes.pipe(response);
+      }
+    );
+    proxyReq.on("error", err => {
+      console.warn(`[Node Proxy] Stream proxy error: ${err.message}`);
+      sendJson(response, 502, { error: "Streaming service unreachable", status: "unavailable" });
+    });
+    return proxyReq.end();
+  }
+  if (url.pathname === "/api/perception/live/frame") {
+    const frameUrl = `${pythonOptimizerUrl}/api/perception/live/frame`;
+    try {
+      const res = await fetch(frameUrl);
+      if (!res.ok) return sendJson(response, res.status, { error: "Failed to get frame" });
+      const buf = Buffer.from(await res.arrayBuffer());
+      response.writeHead(200, {
+        "Content-Type": "image/jpeg",
+        "Cache-Control": "no-cache, no-store, must-revalidate"
+      });
+      return response.end(buf);
+    } catch (err) {
+      return sendJson(response, 502, { error: "Frame service unreachable" });
+    }
+  }
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
   if (url.pathname.startsWith("/api/perception/")) {
     const targetUrl = `${pythonOptimizerUrl}${url.pathname}${url.search}`;
     let bodyData = undefined;
@@ -298,6 +343,52 @@ async function handleApi(request, response, url) {
           source: "fallback_js"
         });
       }
+<<<<<<< HEAD
+=======
+      if (url.pathname === "/api/perception/live/status") {
+        return sendJson(response, 200, {
+          status: "connected",
+          yolo_status: "READY",
+          tracking_status: "ACTIVE",
+          signal_control: "DISABLED",
+          mode: "REAL-TIME DETECTION ONLY",
+          counts: {
+            total_vehicles: 0,
+            total_pedestrians: 0,
+            total_tracked_entities: 0,
+            cars: 0,
+            motorcycles: 0,
+            buses: 0,
+            trucks: 0,
+            average_confidence: 0.0
+          },
+          approaches: {
+            vehicles: { north: 0, south: 0, east: 0, west: 0 },
+            pedestrians: { north: 0, south: 0, east: 0, west: 0 }
+          },
+          queue_lengths: { north: 0, south: 0, east: 0, west: 0 },
+          source: "fallback_js"
+        });
+      }
+      if (url.pathname === "/api/perception/live/start" && request.method === "POST") {
+        return sendJson(response, 200, {
+          status: "running",
+          signal_control: "DISABLED",
+          mode: "REAL-TIME DETECTION ONLY",
+          source_type: (bodyData && bodyData.source_type) || "camera",
+          intersection_id: (bodyData && bodyData.intersection_id) || "J1",
+          source: "fallback_js"
+        });
+      }
+      if (url.pathname === "/api/perception/live/stop" && request.method === "POST") {
+        return sendJson(response, 200, {
+          status: "stopped",
+          signal_control: "DISABLED",
+          mode: "REAL-TIME DETECTION ONLY",
+          source: "fallback_js"
+        });
+      }
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
       if (url.pathname === "/api/perception/process" && request.method === "POST") {
         const iid = (bodyData && bodyData.intersection_id) || "J1";
         const srcType = (bodyData && bodyData.source_type) || "image";

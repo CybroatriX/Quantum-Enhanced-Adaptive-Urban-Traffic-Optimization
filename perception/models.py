@@ -10,6 +10,10 @@ from typing import Any, Mapping, Sequence
 from simulation.models.state import IntersectionTrafficState, SignalState
 
 VALID_VEHICLE_CLASSES = ("car", "motorcycle", "bus", "truck")
+<<<<<<< HEAD
+=======
+VALID_PEDESTRIAN_CLASSES = ("person", "pedestrian")
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
 VALID_APPROACHES = ("north", "south", "east", "west")
 
 
@@ -106,6 +110,100 @@ class VehicleDetection:
 
 
 @dataclass(frozen=True)
+<<<<<<< HEAD
+=======
+class PedestrianDetection:
+    """One detected pedestrian in a camera frame or video."""
+
+    class_name: str = "person"
+    confidence: float = 1.0
+    bbox: tuple[float, float, float, float] = (0.0, 0.0, 0.0, 0.0)  # (x1, y1, x2, y2)
+    center: tuple[float, float] = (0.0, 0.0)  # (cx, cy)
+    track_id: int | None = None
+
+    def __post_init__(self) -> None:
+        c_name = str(self.class_name).lower().strip()
+        if c_name not in VALID_PEDESTRIAN_CLASSES:
+            raise ValueError(
+                f"Invalid pedestrian class '{self.class_name}'. Must be one of {VALID_PEDESTRIAN_CLASSES}."
+            )
+        object.__setattr__(self, "class_name", c_name)
+
+        try:
+            conf = float(self.confidence)
+        except (TypeError, ValueError) as exc:
+            raise ValueError("Confidence must be a float.") from exc
+        if not (0.0 <= conf <= 1.0):
+            raise ValueError("Confidence must be between 0.0 and 1.0.")
+        object.__setattr__(self, "confidence", round(conf, 4))
+
+        if not isinstance(self.bbox, (tuple, list)) or len(self.bbox) != 4:
+            raise ValueError("Bounding box must contain 4 coordinates (x1, y1, x2, y2).")
+        try:
+            bbox_tuple = tuple(float(x) for x in self.bbox)
+        except (TypeError, ValueError) as exc:
+            raise ValueError("All bounding box coordinates must be numeric.") from exc
+        object.__setattr__(self, "bbox", bbox_tuple)
+
+        if not isinstance(self.center, (tuple, list)) or len(self.center) != 2:
+            raise ValueError("Center must contain 2 coordinates (cx, cy).")
+        try:
+            center_tuple = tuple(float(x) for x in self.center)
+        except (TypeError, ValueError) as exc:
+            raise ValueError("All center coordinates must be numeric.") from exc
+        object.__setattr__(self, "center", center_tuple)
+
+        if self.track_id is not None:
+            try:
+                tid = int(self.track_id)
+            except (TypeError, ValueError) as exc:
+                raise ValueError("track_id must be an integer if provided.") from exc
+            if tid < 0:
+                raise ValueError("track_id cannot be negative.")
+            object.__setattr__(self, "track_id", tid)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "class_name": self.class_name,
+            "confidence": round(self.confidence, 4),
+            "bbox": [round(coord, 2) for coord in self.bbox],
+            "center": [round(coord, 2) for coord in self.center],
+            "track_id": self.track_id,
+        }
+
+    @classmethod
+    def from_dict(cls, data: Mapping[str, Any]) -> PedestrianDetection:
+        if not isinstance(data, (dict, Mapping)):
+            raise ValueError("PedestrianDetection data must be a dictionary.")
+
+        raw_class = data.get("class_name", data.get("className", "person"))
+        confidence = float(data.get("confidence", 1.0))
+
+        raw_bbox = data.get("bbox")
+        if raw_bbox is None or len(raw_bbox) != 4:
+            raise ValueError("Bounding box must contain 4 coordinates (x1, y1, x2, y2).")
+        bbox = tuple(float(x) for x in raw_bbox)
+
+        raw_center = data.get("center")
+        if raw_center is not None and len(raw_center) == 2:
+            center = (float(raw_center[0]), float(raw_center[1]))
+        else:
+            center = ((bbox[0] + bbox[2]) / 2.0, (bbox[1] + bbox[3]) / 2.0)
+
+        track_id = data.get("track_id", data.get("trackId"))
+        tid = int(track_id) if track_id is not None else None
+
+        return cls(
+            class_name=str(raw_class),
+            confidence=confidence,
+            bbox=bbox,  # type: ignore[arg-type]
+            center=center,
+            track_id=tid,
+        )
+
+
+@dataclass(frozen=True)
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
 class TrafficObservation:
     """Universal traffic observation structure consumable across simulation and optimization."""
 
@@ -126,6 +224,15 @@ class TrafficObservation:
     tracking_available: bool = False
     tracked_vehicle_count: int = 0
     average_confidence: float = 0.0
+<<<<<<< HEAD
+=======
+    pedestrian_count: int = 0
+    tracked_pedestrian_count: int = 0
+    pedestrian_detections: tuple[PedestrianDetection, ...] = field(default_factory=tuple)
+    pedestrian_approach_counts: dict[str, int] = field(
+        default_factory=lambda: {k: 0 for k in VALID_APPROACHES}
+    )
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
 
     @staticmethod
     def _normalize_counter_dict(
@@ -222,6 +329,37 @@ class TrafficObservation:
         # 11. Tracking available boolean
         object.__setattr__(self, "tracking_available", bool(self.tracking_available))
 
+<<<<<<< HEAD
+=======
+        # 12. Normalize & validate pedestrian_approach_counts
+        norm_ped_approaches = self._normalize_counter_dict(
+            self.pedestrian_approach_counts, VALID_APPROACHES, "pedestrian_approach_counts"
+        )
+        object.__setattr__(self, "pedestrian_approach_counts", norm_ped_approaches)
+
+        # 13. Pedestrian count
+        try:
+            pc = int(self.pedestrian_count)
+        except (TypeError, ValueError) as exc:
+            raise ValueError("Field 'pedestrian_count' must be an integer.") from exc
+        if pc < 0:
+            raise ValueError("Field 'pedestrian_count' cannot be negative.")
+        object.__setattr__(self, "pedestrian_count", pc)
+
+        # 14. Tracked pedestrian count
+        try:
+            tpc = int(self.tracked_pedestrian_count)
+        except (TypeError, ValueError) as exc:
+            raise ValueError("Field 'tracked_pedestrian_count' must be an integer.") from exc
+        if tpc < 0:
+            raise ValueError("Field 'tracked_pedestrian_count' cannot be negative.")
+        object.__setattr__(self, "tracked_pedestrian_count", tpc)
+
+        # 15. Pedestrian detections tuple
+        ped_dets = tuple(self.pedestrian_detections) if self.pedestrian_detections else ()
+        object.__setattr__(self, "pedestrian_detections", ped_dets)
+
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
     def to_dict(self, include_detections: bool = True) -> dict[str, Any]:
         """Convert to JSON-serializable dictionary matching canonical schema."""
         res: dict[str, Any] = {
@@ -235,9 +373,19 @@ class TrafficObservation:
             "queue_lengths": dict(self.queue_lengths),
             "class_counts": dict(self.class_counts),
             "tracking_available": self.tracking_available,
+<<<<<<< HEAD
         }
         if include_detections:
             res["detections"] = [d.to_dict() for d in self.detections]
+=======
+            "pedestrian_count": self.pedestrian_count,
+            "tracked_pedestrian_count": self.tracked_pedestrian_count,
+            "pedestrian_approach_counts": dict(self.pedestrian_approach_counts),
+        }
+        if include_detections:
+            res["detections"] = [d.to_dict() for d in self.detections]
+            res["pedestrian_detections"] = [d.to_dict() for d in self.pedestrian_detections]
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
         return res
 
     def to_json(self, indent: int | None = None, include_detections: bool = True) -> str:
@@ -312,6 +460,37 @@ class TrafficObservation:
         if tracking_avail is None:
             tracking_avail = tracked_count > 0
 
+<<<<<<< HEAD
+=======
+        # Parse pedestrian detections if provided
+        raw_ped_dets = data.get("pedestrian_detections", data.get("pedestrianDetections", ()))
+        pedestrian_detections: list[PedestrianDetection] = []
+        if raw_ped_dets:
+            for p in raw_ped_dets:
+                if isinstance(p, PedestrianDetection):
+                    pedestrian_detections.append(p)
+                elif isinstance(p, (dict, Mapping)):
+                    pedestrian_detections.append(PedestrianDetection.from_dict(p))
+
+        ped_approach_counts = data.get("pedestrian_approach_counts", data.get("pedestrianApproachCounts", {}))
+
+        raw_pc = data.get("pedestrian_count", data.get("pedestrianCount"))
+        if raw_pc is not None:
+            pedestrian_count = int(raw_pc)
+        elif pedestrian_detections:
+            pedestrian_count = len(pedestrian_detections)
+        else:
+            pedestrian_count = 0
+
+        raw_tpc = data.get("tracked_pedestrian_count", data.get("trackedPedestrianCount"))
+        if raw_tpc is not None:
+            tracked_ped_count = int(raw_tpc)
+        elif pedestrian_detections:
+            tracked_ped_count = sum(1 for p in pedestrian_detections if p.track_id is not None)
+        else:
+            tracked_ped_count = 0
+
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
         return cls(
             timestamp=ts,
             source=source,
@@ -324,6 +503,13 @@ class TrafficObservation:
             tracking_available=bool(tracking_avail),
             tracked_vehicle_count=tracked_count,
             average_confidence=avg_conf,
+<<<<<<< HEAD
+=======
+            pedestrian_count=pedestrian_count,
+            tracked_pedestrian_count=tracked_ped_count,
+            pedestrian_detections=tuple(pedestrian_detections),
+            pedestrian_approach_counts=ped_approach_counts or {},
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
         )
 
     @classmethod
