@@ -11,7 +11,11 @@ import logging
 from time import time
 from typing import Any, Mapping
 
+<<<<<<< HEAD
 from flask import Flask, jsonify, request
+=======
+from flask import Flask, jsonify, request, Response
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
 
 logger = logging.getLogger(__name__)
 
@@ -21,6 +25,10 @@ from optimization.quantum.qubo import build_qubo
 from optimization.quantum.solver import solve_exact
 from metrics.evaluator import TrafficMetricsEvaluator
 from perception.models import TrafficObservation
+<<<<<<< HEAD
+=======
+from perception.realtime import RealtimeDetectionEngine
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
 from perception.service import (
     HARDWARE_DISCLAIMER,
     PERCEPTION_DISCLAIMER,
@@ -634,4 +642,61 @@ def create_app(custom_config: Mapping[str, Any] | None = None) -> Flask:
             logger.error("Perception endpoint failed: %s", exc)
             return jsonify({"error": f"Perception service error: {exc}"}), 500
 
+<<<<<<< HEAD
+=======
+    # =========================================================================
+    # Live Camera & Video Detection Endpoints (Perception + Dashboard Only)
+    # =========================================================================
+    live_engine = RealtimeDetectionEngine()
+
+    @app.route("/api/perception/live/start", methods=["POST"])
+    def start_live_perception():
+        body = request.get_json(force=True) if request.is_json else {}
+        if not isinstance(body, dict):
+            body = {}
+
+        source_type = str(body.get("source_type", "camera")).lower().strip()
+        camera_index = int(body.get("camera_index", 0))
+        video_path = body.get("video_path") or body.get("source_path")
+        intersection_id = str(body.get("intersection_id", "J1")).strip() or "J1"
+        confidence_threshold = float(body.get("confidence_threshold", 0.35))
+        inference_fps = float(body.get("inference_fps", 10.0))
+        approach_regions = body.get("approach_regions")
+
+        success = live_engine.start(
+            source_type=source_type,
+            camera_index=camera_index,
+            video_path=video_path,
+            intersection_id=intersection_id,
+            confidence_threshold=confidence_threshold,
+            inference_fps=inference_fps,
+            approach_regions=approach_regions,
+        )
+
+        status_data = live_engine.get_status()
+        status_code = 200 if success else (400 if "not found" in str(status_data.get("error", "")).lower() else 503)
+        return jsonify(status_data), status_code
+
+    @app.route("/api/perception/live/stop", methods=["POST"])
+    def stop_live_perception():
+        live_engine.stop()
+        return jsonify(live_engine.get_status()), 200
+
+    @app.route("/api/perception/live/status", methods=["GET"])
+    def get_live_perception_status():
+        return jsonify(live_engine.get_status()), 200
+
+    @app.route("/api/perception/live/stream", methods=["GET"])
+    def stream_live_perception():
+        return Response(
+            live_engine.generate_mjpeg_stream(),
+            mimetype="multipart/x-mixed-replace; boundary=frame",
+        )
+
+    @app.route("/api/perception/live/frame", methods=["GET"])
+    def get_live_perception_frame():
+        jpeg_bytes = live_engine.get_latest_jpeg()
+        return Response(jpeg_bytes, mimetype="image/jpeg")
+
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
     return app

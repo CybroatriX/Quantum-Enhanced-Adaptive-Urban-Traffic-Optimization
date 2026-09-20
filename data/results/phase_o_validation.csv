@@ -1,4 +1,5 @@
 component,scenario,status,runtime_seconds,observed_result,error
+<<<<<<< HEAD
 Perception / Contract,Canonical TrafficObservation Generation,PASSED,0.00019,Generated 4 validated TrafficObservations across J1-J4,
 MultiIntersectionController,Baseline QUBO Exact Optimization,PASSED,0.0042,"Optimized 4 intersections. J1 green=(40s, 22s)",
 Optimization / QAOA,QAOA Multi-Intersection Sampling,PASSED,5.00115,Sampled valid timings for 4 junctions. J1 obj=1.774803,
@@ -8,3 +9,14 @@ Emergency Corridor,Corridor Advancement and Release,PASSED,0.0004,Ambulance prog
 Precedence Hierarchy,Event Expiration & Baseline Resumption,PASSED,0.0008,Accident expired; all junctions cleanly returned to normal QUBO control.,
 Metrics / Environmental,Network Aggregation & Stoichiometric CO2,PASSED,0.00027,"Aggregated 4 junctions. Fuel=0.9719L, CO2=2324.42g",
 Real-World Prototype,Perception -> Tracking -> Aggregation -> QUBO Signal Recommendation,PASSED,0.00173,"Prototype signal recommendation: P0=40s, P2=22s",
+=======
+Perception / Contract,Canonical TrafficObservation Generation,PASSED,8e-05,Generated 4 validated TrafficObservations across J1-J4,
+MultiIntersectionController,Baseline QUBO Exact Optimization,PASSED,0.0024,"Optimized 4 intersections. J1 green=(40s, 22s)",
+Optimization / QAOA,QAOA Multi-Intersection Sampling,PASSED,2.88138,Sampled valid timings for 4 junctions. J1 obj=1.774803,
+Dynamic Events,Accident Event Adaptive Re-Optimization,PASSED,8e-05,J2 capacity throttled to 35%; signal status=event_adapted,
+Emergency Corridor,Emergency Preemption Overriding Dynamic Event,PASSED,0.00019,Preemption active across J1-J4. J2 event preempted by ambulance.,
+Emergency Corridor,Corridor Advancement and Release,PASSED,0.0004,Ambulance progressed past J2; corridor cleanly released.,
+Precedence Hierarchy,Event Expiration & Baseline Resumption,PASSED,0.0008,Accident expired; all junctions cleanly returned to normal QUBO control.,
+Metrics / Environmental,Network Aggregation & Stoichiometric CO2,PASSED,0.00021,"Aggregated 4 junctions. Fuel=0.9719L, CO2=2324.42g",
+Real-World Prototype,Perception -> Tracking -> Aggregation -> QUBO Signal Recommendation,PASSED,0.00126,"Prototype signal recommendation: P0=40s, P2=22s",
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)

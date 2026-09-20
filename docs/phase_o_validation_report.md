@@ -9,6 +9,7 @@ This document presents the complete, empirical verification of the Quantum-Enhan
 
 | Subsystem / Component | Validation Scenario | Status | Latency | Observed Outcome |
 | :--- | :--- | :---: | :---: | :--- |
+<<<<<<< HEAD
 | **Perception / Contract** | Canonical TrafficObservation Generation | `PASSED` | 0.00019s | Generated 4 validated TrafficObservations across J1-J4 |
 | **MultiIntersectionController** | Baseline QUBO Exact Optimization | `PASSED` | 0.00420s | Optimized 4 intersections. J1 green=(40s, 22s) |
 | **Optimization / QAOA** | QAOA Multi-Intersection Sampling | `PASSED` | 5.00115s | Sampled valid timings for 4 junctions. J1 obj=1.774803 |
@@ -18,6 +19,17 @@ This document presents the complete, empirical verification of the Quantum-Enhan
 | **Precedence Hierarchy** | Event Expiration & Baseline Resumption | `PASSED` | 0.00080s | Accident expired; all junctions cleanly returned to normal QUBO control. |
 | **Metrics / Environmental** | Network Aggregation & Stoichiometric CO2 | `PASSED` | 0.00027s | Aggregated 4 junctions. Fuel=0.9719L, CO2=2324.42g |
 | **Real-World Prototype** | Perception -> Tracking -> Aggregation -> QUBO Signal Recommendation | `PASSED` | 0.00173s | Prototype signal recommendation: P0=40s, P2=22s |
+=======
+| **Perception / Contract** | Canonical TrafficObservation Generation | `PASSED` | 0.00008s | Generated 4 validated TrafficObservations across J1-J4 |
+| **MultiIntersectionController** | Baseline QUBO Exact Optimization | `PASSED` | 0.00240s | Optimized 4 intersections. J1 green=(40s, 22s) |
+| **Optimization / QAOA** | QAOA Multi-Intersection Sampling | `PASSED` | 2.88138s | Sampled valid timings for 4 junctions. J1 obj=1.774803 |
+| **Dynamic Events** | Accident Event Adaptive Re-Optimization | `PASSED` | 0.00008s | J2 capacity throttled to 35%; signal status=event_adapted |
+| **Emergency Corridor** | Emergency Preemption Overriding Dynamic Event | `PASSED` | 0.00019s | Preemption active across J1-J4. J2 event preempted by ambulance. |
+| **Emergency Corridor** | Corridor Advancement and Release | `PASSED` | 0.00040s | Ambulance progressed past J2; corridor cleanly released. |
+| **Precedence Hierarchy** | Event Expiration & Baseline Resumption | `PASSED` | 0.00080s | Accident expired; all junctions cleanly returned to normal QUBO control. |
+| **Metrics / Environmental** | Network Aggregation & Stoichiometric CO2 | `PASSED` | 0.00021s | Aggregated 4 junctions. Fuel=0.9719L, CO2=2324.42g |
+| **Real-World Prototype** | Perception -> Tracking -> Aggregation -> QUBO Signal Recommendation | `PASSED` | 0.00126s | Prototype signal recommendation: P0=40s, P2=22s |
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
 
 ---
 
@@ -35,6 +47,7 @@ This document presents the complete, empirical verification of the Quantum-Enhan
 
 | Operation / Subsystem | Measured Latency (s) | Execution Mode |
 | :--- | :---: | :--- |
+<<<<<<< HEAD
 | `observation_creation_seconds` | 0.00019 s | Classical Deterministic |
 | `qubo_exact_batch_seconds` | 0.00420 s | Classical Deterministic |
 | `qaoa_batch_seconds` | 5.00115 s | Quantum (Qiskit Aer) |
@@ -42,6 +55,15 @@ This document presents the complete, empirical verification of the Quantum-Enhan
 | `emergency_corridor_request_seconds` | 0.00012 s | Classical Deterministic |
 | `metrics_evaluation_seconds` | 0.00027 s | Classical Deterministic |
 | `realworld_prototype_pipeline_seconds` | 0.00173 s | Classical Deterministic |
+=======
+| `observation_creation_seconds` | 0.00008 s | Classical Deterministic |
+| `qubo_exact_batch_seconds` | 0.00240 s | Classical Deterministic |
+| `qaoa_batch_seconds` | 2.88138 s | Quantum (Qiskit Aer) |
+| `dynamic_event_registration_seconds` | 0.00008 s | Classical Deterministic |
+| `emergency_corridor_request_seconds` | 0.00019 s | Classical Deterministic |
+| `metrics_evaluation_seconds` | 0.00021 s | Classical Deterministic |
+| `realworld_prototype_pipeline_seconds` | 0.00126 s | Classical Deterministic |
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
 
 ---
 

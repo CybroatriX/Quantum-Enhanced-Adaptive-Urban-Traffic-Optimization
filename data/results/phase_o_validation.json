@@ -1,13 +1,21 @@
 {
   "phase": "Phase O",
   "title": "End-to-End System Validation & Final Integration",
+<<<<<<< HEAD
   "validation_timestamp": 1789847823.5377462,
+=======
+  "validation_timestamp": 1789859913.771755,
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
   "test_records": [
     {
       "component": "Perception / Contract",
       "scenario": "Canonical TrafficObservation Generation",
       "status": "PASSED",
+<<<<<<< HEAD
       "runtime_seconds": 0.00019,
+=======
+      "runtime_seconds": 8e-05,
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
       "observed_result": "Generated 4 validated TrafficObservations across J1-J4",
       "error": null
     },
@@ -15,7 +23,11 @@
       "component": "MultiIntersectionController",
       "scenario": "Baseline QUBO Exact Optimization",
       "status": "PASSED",
+<<<<<<< HEAD
       "runtime_seconds": 0.0042,
+=======
+      "runtime_seconds": 0.0024,
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
       "observed_result": "Optimized 4 intersections. J1 green=(40s, 22s)",
       "error": null
     },
@@ -23,7 +35,11 @@
       "component": "Optimization / QAOA",
       "scenario": "QAOA Multi-Intersection Sampling",
       "status": "PASSED",
+<<<<<<< HEAD
       "runtime_seconds": 5.00115,
+=======
+      "runtime_seconds": 2.88138,
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
       "observed_result": "Sampled valid timings for 4 junctions. J1 obj=1.774803",
       "error": null
     },
@@ -31,7 +47,11 @@
       "component": "Dynamic Events",
       "scenario": "Accident Event Adaptive Re-Optimization",
       "status": "PASSED",
+<<<<<<< HEAD
       "runtime_seconds": 0.00022,
+=======
+      "runtime_seconds": 8e-05,
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
       "observed_result": "J2 capacity throttled to 35%; signal status=event_adapted",
       "error": null
     },
@@ -39,7 +59,11 @@
       "component": "Emergency Corridor",
       "scenario": "Emergency Preemption Overriding Dynamic Event",
       "status": "PASSED",
+<<<<<<< HEAD
       "runtime_seconds": 0.00012,
+=======
+      "runtime_seconds": 0.00019,
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
       "observed_result": "Preemption active across J1-J4. J2 event preempted by ambulance.",
       "error": null
     },
@@ -63,7 +87,11 @@
       "component": "Metrics / Environmental",
       "scenario": "Network Aggregation & Stoichiometric CO2",
       "status": "PASSED",
+<<<<<<< HEAD
       "runtime_seconds": 0.00027,
+=======
+      "runtime_seconds": 0.00021,
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
       "observed_result": "Aggregated 4 junctions. Fuel=0.9719L, CO2=2324.42g",
       "error": null
     },
@@ -71,7 +99,11 @@
       "component": "Real-World Prototype",
       "scenario": "Perception -> Tracking -> Aggregation -> QUBO Signal Recommendation",
       "status": "PASSED",
+<<<<<<< HEAD
       "runtime_seconds": 0.00173,
+=======
+      "runtime_seconds": 0.00126,
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
       "observed_result": "Prototype signal recommendation: P0=40s, P2=22s",
       "error": null
     }
@@ -275,6 +307,7 @@
     }
   },
   "latencies_seconds": {
+<<<<<<< HEAD
     "observation_creation_seconds": 0.00019320000137668103,
     "qubo_exact_batch_seconds": 0.004203099997539539,
     "qaoa_batch_seconds": 5.001152400000137,
@@ -282,5 +315,14 @@
     "emergency_corridor_request_seconds": 0.00012350000179139897,
     "metrics_evaluation_seconds": 0.0002691000045160763,
     "realworld_prototype_pipeline_seconds": 0.0017347000029985793
+=======
+    "observation_creation_seconds": 7.840000000669534e-05,
+    "qubo_exact_batch_seconds": 0.0023987000000715852,
+    "qaoa_batch_seconds": 2.881382199999962,
+    "dynamic_event_registration_seconds": 7.989999994606478e-05,
+    "emergency_corridor_request_seconds": 0.00019190000000435248,
+    "metrics_evaluation_seconds": 0.00020760000006703194,
+    "realworld_prototype_pipeline_seconds": 0.00126389999991261
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
   }
 }

@@ -8,10 +8,27 @@ from time import time
 from typing import Any, Mapping, Sequence, Union
 
 from perception.aggregator import TrafficAggregator
+<<<<<<< HEAD
 from perception.models import TrafficObservation, VALID_VEHICLE_CLASSES, VehicleDetection
 
 logger = logging.getLogger(__name__)
 
+=======
+from perception.models import (
+    PedestrianDetection,
+    TrafficObservation,
+    VALID_VEHICLE_CLASSES,
+    VehicleDetection,
+)
+
+logger = logging.getLogger(__name__)
+
+# COCO 80 dataset class indices for pedestrian (person)
+COCO_PERSON_CLASS = {
+    0: "person",
+}
+
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
 # COCO 80 dataset class indices for relevant road vehicles
 COCO_VEHICLE_CLASSES = {
     2: "car",
@@ -20,6 +37,18 @@ COCO_VEHICLE_CLASSES = {
     7: "truck",
 }
 
+<<<<<<< HEAD
+=======
+# All permitted detection targets: pedestrians + vehicles only
+COCO_TARGET_CLASSES = {
+    0: "person",
+    2: "car",
+    3: "motorcycle",
+    5: "bus",
+    7: "truck",
+}
+
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
 
 class YOLOVehicleDetector:
     """Ultralytics YOLOv8 vehicle detector for images, video frames, and streams."""
@@ -58,6 +87,10 @@ class YOLOVehicleDetector:
         intersection_id: str = "J1",
         track: bool = False,
         timestamp: float | None = None,
+<<<<<<< HEAD
+=======
+        detect_pedestrians: bool = True,
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
     ) -> TrafficObservation:
         """Run vehicle detection on an image, video frame, or array.
 
@@ -83,7 +116,13 @@ class YOLOVehicleDetector:
             )
 
         try:
+<<<<<<< HEAD
             target_classes = list(COCO_VEHICLE_CLASSES.keys())
+=======
+            target_class_map = COCO_TARGET_CLASSES if detect_pedestrians else COCO_VEHICLE_CLASSES
+            target_classes = list(target_class_map.keys())
+
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
             if track:
                 results = model.track(
                     source=source,
@@ -103,6 +142,10 @@ class YOLOVehicleDetector:
                 )
 
             raw_detections: list[VehicleDetection] = []
+<<<<<<< HEAD
+=======
+            raw_pedestrians: list[PedestrianDetection] = []
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
             frame_shape = None
 
             if results and len(results) > 0:
@@ -112,8 +155,13 @@ class YOLOVehicleDetector:
                 if boxes is not None and len(boxes) > 0:
                     for i in range(len(boxes)):
                         cls_id = int(boxes.cls[i].item())
+<<<<<<< HEAD
                         class_name = COCO_VEHICLE_CLASSES.get(cls_id)
                         if not class_name:
+=======
+                        # Strictly filter: only accept targeted classes
+                        if cls_id not in target_class_map:
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
                             continue
 
                         conf = float(boxes.conf[i].item())
@@ -129,6 +177,7 @@ class YOLOVehicleDetector:
                             except (IndexError, TypeError):
                                 pass
 
+<<<<<<< HEAD
                         det = VehicleDetection(
                             class_name=class_name,
                             confidence=conf,
@@ -137,6 +186,29 @@ class YOLOVehicleDetector:
                             track_id=track_id,
                         )
                         raw_detections.append(det)
+=======
+                        if cls_id == 0:
+                            # Pedestrian target
+                            ped_det = PedestrianDetection(
+                                class_name="person",
+                                confidence=conf,
+                                bbox=(x1, y1, x2, y2),
+                                center=(cx, cy),
+                                track_id=track_id,
+                            )
+                            raw_pedestrians.append(ped_det)
+                        elif cls_id in COCO_VEHICLE_CLASSES:
+                            # Vehicle target
+                            veh_class = COCO_VEHICLE_CLASSES[cls_id]
+                            det = VehicleDetection(
+                                class_name=veh_class,
+                                confidence=conf,
+                                bbox=(x1, y1, x2, y2),
+                                center=(cx, cy),
+                                track_id=track_id,
+                            )
+                            raw_detections.append(det)
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
 
             return self.aggregator.aggregate(
                 detections=raw_detections,
@@ -144,6 +216,10 @@ class YOLOVehicleDetector:
                 timestamp=now,
                 source="yolov8",
                 frame_shape=frame_shape,
+<<<<<<< HEAD
+=======
+                pedestrian_detections=raw_pedestrians,
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
             )
 
         except Exception as exc:

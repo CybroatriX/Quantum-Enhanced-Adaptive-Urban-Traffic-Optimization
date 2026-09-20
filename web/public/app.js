@@ -21,8 +21,12 @@
     "co2Metric", "pedWaitMetric", "incidentMetric", "ambulanceMetric", "fixedWait", "hybridWait",
     "fixedQueue", "hybridQueue", "fixedFuel", "hybridFuel", "fixedCo2", "hybridCo2", "waitReduction",
     "emissionReduction", "waitBar", "emissionBar", "winnerBadge", "junctionName", "junctionTitle",
+<<<<<<< HEAD
     "nLight", "sLight", "eLight", "wLight", "nSignalText", "sSignalText", "eSignalText", "wSignalText",
     "phaseLabel",
+=======
+    "nsLight", "ewLight", "nsSignalText", "ewSignalText", "nsQueue", "ewQueue", "phaseLabel",
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
     "phaseTimer", "junctionDensity", "junctionCapacity", "junctionPedestrians", "quboNs", "quboEw",
     "quboObjective", "algorithmSource", "algorithmStatus", "corridorSection", "corridorStatus",
     "corridorRoute", "corridorEta", "corridorBar", "cameraName", "cameraVehicleCount",
@@ -42,7 +46,21 @@
     "rwStatusText", "rwActiveSourceLabel", "rwNorthQueue", "rwSouthQueue", "rwEastQueue", "rwWestQueue",
     "rwCarCount", "rwBusCount", "rwTruckCount", "rwMotoCount", "rwTotalVehicles", "rwTrackedVehicles",
     "rwAvgConfidence", "rwSolverLabel", "rwRecNs", "rwRecEw", "rwRecObjective", "rwRecCycle", "rwRecValid",
+<<<<<<< HEAD
     "rwRecommendationNote"
+=======
+    "rwRecommendationNote",
+    "tabRealtimeBtn", "tabRealtime", "rtModeBadge", "rtCamStatusText", "rtYoloStatusText", "rtTrackingStatusText",
+    "rtSourceSelect", "rtIntersectionSelect", "rtCustomPathGroup", "rtCustomPathInput",
+    "rtConfValueDisplay", "rtConfidenceSlider", "rtInferenceFpsSelect",
+    "btnStartRealtime", "btnStopRealtime", "rtFpsDisplay", "rtVideoViewport",
+    "rtLiveStreamImg", "rtStreamPlaceholder", "rtPlaceholderTitle", "rtPlaceholderSubtitle",
+    "rtStreamErrorBox", "rtStreamErrorMsg", "btnDismissRtError",
+    "rtHeroVehicleCount", "rtHeroPedestrianCount", "rtCountCar", "rtCountMoto", "rtCountBus", "rtCountTruck",
+    "rtTotalTracked", "rtConfidencePercent", "rtApprVehNorth", "rtApprVehSouth", "rtApprVehEast", "rtApprVehWest",
+    "rtApprPedNorth", "rtApprPedSouth", "rtApprPedEast", "rtApprPedWest", "rtPedRoiMessage",
+    "rtQueueSection", "rtQueueActiveState", "rtQueueN", "rtQueueS", "rtQueueE", "rtQueueW"
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
   ].map(id => [id, $(id)]));
 
   const COLORS = {
@@ -53,12 +71,17 @@
   const VEHICLE_WIDTH = { car: 7, bus: 8.5, service: 7.5, ambulance: 8.5 };
   const VEHICLE_COLORS = ["#56c7ff", "#dbe9ef", "#9a7cff", "#57e3be", "#f28bb0", "#86aaff", "#ffbd66"];
   const EVENT_PENALTY = { congestion: 18, accident: 75, closure: 500 };
+<<<<<<< HEAD
   const SIGNAL_DIRECTIONS = ["N", "S", "E", "W"];
 
   // Safety, headway, and distance threshold constants
   const STOP_LINE_DISTANCE = 58;
   const TURN_ENTRY_DISTANCE = 54;
   const COMFORTABLE_BRAKING = 9;
+=======
+
+  // Safety, headway, and distance threshold constants
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
   const SPAWN_CLEARANCE_GAP = 42; // px clearance required at entrance point
   const AMBULANCE_DETECTION_DISTANCE = Core.AMBULANCE_DETECTION_DISTANCE || 175; // px: distance behind vehicle to trigger yield
   const EMERGENCY_CLEARANCE_DISTANCE = Core.EMERGENCY_CLEARANCE_DISTANCE || 55; // px: ambulance distance ahead to begin return-to-lane
@@ -99,6 +122,7 @@
   let baselineCo2 = 0;
   let corridorCompleted = 0;
   let corridorBaseline = 0;
+<<<<<<< HEAD
   let lastBoundaryPair = null;
   let junctionEntries = [];
   let redLightViolations = 0;
@@ -106,6 +130,9 @@
   let vehicleExits = [];
   let vehicleSpawns = [];
   let closureJunctionDetours = [];
+=======
+  let odCursor = 0;
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
 
   function clamp(value, min, max) { return Math.max(min, Math.min(max, value)); }
   function formatTime(seconds) {
@@ -127,6 +154,7 @@
   function incomingDirection(from, to) {
     const a = city.nodes[from];
     const b = city.nodes[to];
+<<<<<<< HEAD
     const dx = b.x - a.x;
     const dy = b.y - a.y;
     if (Math.abs(dx) >= Math.abs(dy)) return dx > 0 ? "W" : "E";
@@ -134,6 +162,16 @@
   }
   function directionAxis(direction) {
     return direction === "N" || direction === "S" ? "NS" : "EW";
+=======
+    if (!a || !b) return null;
+    const dx = b.x - a.x;
+    const dy = b.y - a.y;
+    if (Math.abs(dy) > Math.abs(dx)) {
+      return dy > 0 ? "NORTH" : "SOUTH";
+    } else {
+      return dx > 0 ? "WEST" : "EAST";
+    }
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
   }
   function blockedRoads() {
     return new Set([...roadEvents.values()]
@@ -141,12 +179,22 @@
       .map(event => event.key));
   }
 
+<<<<<<< HEAD
   function makeSignal(node) {
     const startDirection = SIGNAL_DIRECTIONS[(node.id + city.numericSeed) % SIGNAL_DIRECTIONS.length];
     return {
       id: node.id,
       phase: `${startDirection}_GREEN`,
       remaining: 8 + random() * 14,
+=======
+  const INITIAL_PHASES = ["NORTH_GREEN", "SOUTH_GREEN", "EAST_GREEN", "WEST_GREEN"];
+  function makeSignal(node) {
+    const initialIndex = (node.id + city.numericSeed) % 4;
+    return {
+      id: node.id,
+      phase: INITIAL_PHASES[initialIndex],
+      remaining: 8 + random() * 12,
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
       nsGreen: 30,
       ewGreen: 30,
       pendingNsGreen: null,
@@ -154,10 +202,19 @@
       lastAdjustmentTime: -999,
       nsQueue: 0,
       ewQueue: 0,
+<<<<<<< HEAD
       directionQueues: { N: 0, S: 0, E: 0, W: 0 },
       requestedAxis: null,
       requestedDirection: null,
       nextDirection: SIGNAL_DIRECTIONS[(SIGNAL_DIRECTIONS.indexOf(startDirection) + 1) % SIGNAL_DIRECTIONS.length],
+=======
+      northQueue: 0,
+      southQueue: 0,
+      eastQueue: 0,
+      westQueue: 0,
+      requestedAxis: null,
+      requestedDirection: null,
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
       priorityActive: false,
       pedestrians: node.pedestrianDemand * 4,
       pedestrianWait: 0,
@@ -187,6 +244,7 @@
     spawnAccumulator = 0;
     optimizerAccumulator = 0;
     metricAccumulator = 0;
+<<<<<<< HEAD
     lastBoundaryPair = null;
     junctionEntries = [];
     redLightViolations = 0;
@@ -194,6 +252,9 @@
     vehicleExits = [];
     vehicleSpawns = [];
     closureJunctionDetours = [];
+=======
+    odCursor = 0;
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
     events = [];
     for (let attempts = 0; attempts < 160 && vehicles.length < 24; attempts += 1) spawnRegularVehicle(true);
     fitCity();
@@ -224,14 +285,27 @@
   }
 
   function chooseBoundaryPair() {
+<<<<<<< HEAD
     const pair = Core.chooseRandomBoundaryPair(city, random, lastBoundaryPair);
     lastBoundaryPair = pair;
     return pair;
+=======
+    const boundaries = city.boundaryNodes && city.boundaryNodes.length > 1
+      ? city.boundaryNodes
+      : [4, 5, 6, 7, 8, 9, 10, 11];
+    const startIndex = Math.floor(random() * boundaries.length);
+    const start = boundaries[startIndex];
+    const remaining = boundaries.filter(nodeId => nodeId !== start);
+    const targetIndex = Math.floor(random() * remaining.length);
+    const target = remaining[targetIndex];
+    return { start, target };
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
   }
 
   function findFreeLane(from, to, preferred = null) {
     const edge = edgeBetween(from, to);
     if (!edge) return -1;
+<<<<<<< HEAD
     const lanes = preferred === null
       ? Array.from({ length: edge.lanes }, (_, lane) => lane).sort(() => random() - .5)
       : [preferred, ...Array.from({ length: edge.lanes }, (_, lane) => lane).filter(lane => lane !== preferred)];
@@ -243,6 +317,17 @@
       if (!occupied) return lane;
     }
     return -1;
+=======
+    const allLanes = Array.from({ length: edge.lanes }, (_, lane) => lane);
+    const freeLanes = allLanes.filter(lane => !vehicles.some(vehicle =>
+      vehicle.from === from && vehicle.to === to && vehicle.lane === lane &&
+      vehicle.progress * edge.length < SPAWN_CLEARANCE_GAP
+    ));
+    if (freeLanes.length === 0) return -1;
+    if (preferred !== null && freeLanes.includes(preferred)) return preferred;
+    if (freeLanes.length === 1) return freeLanes[0];
+    return freeLanes[Math.floor(random() * freeLanes.length)];
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
   }
 
   function buildingVehiclePosition(vehicle) {
@@ -281,11 +366,17 @@
 
   function createVehicle(path, type, initialProgress = 0) {
     if (!path || path.length < 2) return false;
+<<<<<<< HEAD
     // Regular traffic must enter through an explicit perimeter gateway and
     // leave through a perimeter gateway. J1-J4 are never spawn/end points.
     if (!city.nodes[path[0]] || !city.nodes[path.at(-1)]) return false;
     const spawnPoint = city.spawnPoints.find(point => point.nodeId === path[0]);
     if (type !== "ambulance" && (!spawnPoint || path[1] !== spawnPoint.toNode || !city.boundaryNodes.includes(path.at(-1)))) return false;
+=======
+    // Validate route: verify start is a boundary node (for normal vehicles) or valid node, and every edge exists
+    if (!city.nodes[path[0]] || !city.nodes[path.at(-1)]) return false;
+    if (type !== "ambulance" && !city.boundaryNodes.includes(path[0])) return false;
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
     for (let i = 0; i < path.length - 1; i += 1) {
       const seg = edgeBetween(path[i], path[i + 1]);
       if (!seg || seg.lanes < 1) return false;
@@ -320,8 +411,11 @@
       type,
       path,
       pathIndex: 1,
+<<<<<<< HEAD
       spawnNode: path[0],
       spawnPointId: spawnPoint?.id || null,
+=======
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
       from: path[0],
       to: path[1],
       target: path.at(-1),
@@ -350,6 +444,7 @@
       color: type === "ambulance" ? COLORS.red : type === "bus" ? COLORS.amber :
         type === "service" ? COLORS.violet : VEHICLE_COLORS[Math.floor(random() * VEHICLE_COLORS.length)]
     });
+<<<<<<< HEAD
     if (type !== "ambulance") {
       vehicleSpawns.push({
         vehicleId: vehicles.at(-1).id,
@@ -360,6 +455,8 @@
       });
       if (vehicleSpawns.length > 500) vehicleSpawns.shift();
     }
+=======
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
     return true;
   }
 
@@ -367,7 +464,11 @@
     const { start, target } = chooseBoundaryPair();
     const route = Core.diversePath(city, start, target, blockedRoads(), edgeDynamicCosts(), random);
     if (!route || route.length < 2) return false;
+<<<<<<< HEAD
     if (!city.boundaryNodes.includes(route[0]) || !city.boundaryNodes.includes(route.at(-1))) return false;
+=======
+    if (!city.boundaryNodes.includes(route[0])) return false;
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
     const roll = random();
     const type = roll < .06 ? "bus" : roll < .11 ? "service" : "car";
     if (!createVehicle(route, type, 0)) return false;
@@ -422,6 +523,7 @@
     return "ok";
   }
 
+<<<<<<< HEAD
   function reachableExitRoute(vehicle, currentNode) {
     const blocked = blockedRoads();
     const costs = edgeDynamicCosts();
@@ -488,11 +590,20 @@
     return true;
   }
 
+=======
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
   function updateQueuesAndPriority() {
     for (const signal of signals) {
       signal.nsQueue = 0;
       signal.ewQueue = 0;
+<<<<<<< HEAD
       signal.directionQueues = { N: 0, S: 0, E: 0, W: 0 };
+=======
+      signal.northQueue = 0;
+      signal.southQueue = 0;
+      signal.eastQueue = 0;
+      signal.westQueue = 0;
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
       signal.requestedAxis = null;
       signal.requestedDirection = null;
     }
@@ -502,23 +613,49 @@
       if (!edge) continue;
       const distanceToSignal = edge.length * (1 - vehicle.progress);
       if (distanceToSignal < 110 && (vehicle.stopped || vehicle.currentSpeed < vehicle.speed * .4)) {
+<<<<<<< HEAD
         const direction = incomingDirection(vehicle.from, vehicle.to);
         const axis = incomingAxis(vehicle.from, vehicle.to);
         signals[vehicle.to].directionQueues[direction] += 1;
         if (axis === "NS") signals[vehicle.to].nsQueue += 1;
         else signals[vehicle.to].ewQueue += 1;
+=======
+        const dir = incomingDirection(vehicle.from, vehicle.to);
+        if (dir === "NORTH") {
+          signals[vehicle.to].northQueue += 1;
+          signals[vehicle.to].nsQueue += 1;
+        } else if (dir === "SOUTH") {
+          signals[vehicle.to].southQueue += 1;
+          signals[vehicle.to].nsQueue += 1;
+        } else if (dir === "EAST") {
+          signals[vehicle.to].eastQueue += 1;
+          signals[vehicle.to].ewQueue += 1;
+        } else if (dir === "WEST") {
+          signals[vehicle.to].westQueue += 1;
+          signals[vehicle.to].ewQueue += 1;
+        }
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
       }
       if (vehicle.type === "ambulance") {
         for (let index = vehicle.pathIndex; index < Math.min(vehicle.path.length, vehicle.pathIndex + 4); index += 1) {
           const from = index === vehicle.pathIndex ? vehicle.from : vehicle.path[index - 1];
           const to = vehicle.path[index];
+<<<<<<< HEAD
           const direction = incomingDirection(from, to);
           signals[to].requestedDirection = direction;
           signals[to].requestedAxis = directionAxis(direction);
+=======
+          const dir = incomingDirection(from, to);
+          if (dir && signals[to]) {
+            signals[to].requestedDirection = dir;
+            signals[to].requestedAxis = (dir === "NORTH" || dir === "SOUTH") ? "NS" : "EW";
+          }
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
         }
       }
     }
     for (const signal of signals) {
+<<<<<<< HEAD
       if (signal.requestedDirection && !signal.priorityActive) signal.priorityActive = true;
       if (!signal.requestedDirection && signal.priorityActive && ambulances.length === 0) signal.priorityActive = false;
     }
@@ -568,17 +705,203 @@
 
   function junctionOccupied(junctionId) {
     return vehicles.some(vehicle => vehicle.inTurn && vehicle.turnCurve?.nextFrom === junctionId);
+=======
+      if ((signal.requestedDirection || signal.requestedAxis) && !signal.priorityActive) signal.priorityActive = true;
+      if (!signal.requestedDirection && !signal.requestedAxis && signal.priorityActive && ambulances.length === 0) signal.priorityActive = false;
+    }
+  }
+
+  function phaseAxis(phase) {
+    if (phase.startsWith("NORTH") || phase.startsWith("SOUTH") || phase.startsWith("NS")) return "NS";
+    if (phase.startsWith("EAST") || phase.startsWith("WEST") || phase.startsWith("EW")) return "EW";
+    return null;
+  }
+
+  function directionColor(phase, dir) {
+    if (!phase) return "red";
+    const p = typeof phase === "string" ? phase : phase?.phase || "";
+    const d = String(dir || "").toUpperCase();
+
+    if (d === "NORTH" || d === "N") {
+      if (p === "NORTH_GREEN") return "green";
+      if (p === "NORTH_YELLOW") return "yellow";
+      return "red";
+    }
+    if (d === "SOUTH" || d === "S") {
+      if (p === "SOUTH_GREEN") return "green";
+      if (p === "SOUTH_YELLOW") return "yellow";
+      return "red";
+    }
+    if (d === "EAST" || d === "E") {
+      if (p === "EAST_GREEN") return "green";
+      if (p === "EAST_YELLOW") return "yellow";
+      return "red";
+    }
+    if (d === "WEST" || d === "W") {
+      if (p === "WEST_GREEN") return "green";
+      if (p === "WEST_YELLOW") return "yellow";
+      return "red";
+    }
+
+    if (p === `${d}_GREEN`) return "green";
+    if (p === `${d}_YELLOW`) return "yellow";
+    return "red";
+  }
+
+  function phaseColor(phase, axisOrDir) {
+    const d = String(axisOrDir || "").toUpperCase();
+    if (d === "NORTH" || d === "SOUTH" || d === "EAST" || d === "WEST" || d === "N" || d === "S" || d === "E" || d === "W") {
+      return directionColor(phase, d);
+    }
+    const p = typeof phase === "string" ? phase : phase?.phase || "";
+    if (d === "NS") {
+      if (p === "NORTH_GREEN" || p === "SOUTH_GREEN" || p === "NS_GREEN") return "green";
+      if (p === "NORTH_YELLOW" || p === "SOUTH_YELLOW" || p === "NS_YELLOW") return "yellow";
+      return "red";
+    }
+    if (d === "EW") {
+      if (p === "EAST_GREEN" || p === "WEST_GREEN" || p === "EW_GREEN") return "green";
+      if (p === "EAST_YELLOW" || p === "WEST_YELLOW" || p === "EW_YELLOW") return "yellow";
+      return "red";
+    }
+    return "red";
+  }
+
+  function isConflictingGreen(signal) {
+    const phase = typeof signal === "string" ? signal : signal?.phase;
+    if (!phase) return false;
+    const north = directionColor(phase, "NORTH");
+    const south = directionColor(phase, "SOUTH");
+    const east = directionColor(phase, "EAST");
+    const west = directionColor(phase, "WEST");
+
+    const greens = [north, south, east, west].filter(c => c === "green").length;
+    if (greens > 1) return true;
+
+    const yellows = [north, south, east, west].filter(c => c === "yellow").length;
+    if (yellows > 1) return true;
+
+    if (greens > 0 && yellows > 0) return true;
+
+    if (north === "green" && south === "green") return true;
+    if (east === "green" && west === "green") return true;
+
+    if (phase === "NORTH_GREEN" && (north !== "green" || south !== "red" || east !== "red" || west !== "red")) return true;
+    if (phase === "SOUTH_GREEN" && (south !== "green" || north !== "red" || east !== "red" || west !== "red")) return true;
+    if (phase === "EAST_GREEN" && (east !== "green" || north !== "red" || south !== "red" || west !== "red")) return true;
+    if (phase === "WEST_GREEN" && (west !== "green" || north !== "red" || south !== "red" || east !== "red")) return true;
+
+    if (phase === "NORTH_YELLOW" && (north !== "yellow" || south !== "red" || east !== "red" || west !== "red")) return true;
+    if (phase === "SOUTH_YELLOW" && (south !== "yellow" || north !== "red" || east !== "red" || west !== "red")) return true;
+    if (phase === "EAST_YELLOW" && (east !== "yellow" || north !== "red" || south !== "red" || west !== "red")) return true;
+    if (phase === "WEST_YELLOW" && (west !== "yellow" || north !== "red" || south !== "red" || east !== "red")) return true;
+
+    if (phase.startsWith("ALL_RED") && (north !== "red" || south !== "red" || east !== "red" || west !== "red")) return true;
+
+    return false;
+  }
+
+  function advanceSignal(signal) {
+    const pedestrianDemand = Number(ui?.pedestrianRange?.value || 20) / 100;
+    const allRedDuration = 2 + Math.min(3, pedestrianDemand * (signal.pedestrians || 0) * 0.3);
+    const yellowDuration = 4;
+
+    const nsGreenTime = clamp(signal.nsGreen || 30, 18, 40);
+    const ewGreenTime = clamp(signal.ewGreen || 30, 18, 40);
+
+    if (signal.pendingNsGreen != null) {
+      signal.nsGreen = signal.pendingNsGreen;
+      signal.pendingNsGreen = null;
+    }
+    if (signal.pendingEwGreen != null) {
+      signal.ewGreen = signal.pendingEwGreen;
+      signal.pendingEwGreen = null;
+    }
+
+    switch (signal.phase) {
+      case "NORTH_GREEN":
+        signal.phase = "NORTH_YELLOW";
+        signal.remaining = yellowDuration;
+        break;
+
+      case "NORTH_YELLOW":
+        signal.phase = "ALL_RED_TO_SOUTH";
+        signal.remaining = allRedDuration;
+        break;
+
+      case "ALL_RED_TO_SOUTH":
+        signal.phase = "SOUTH_GREEN";
+        signal.remaining = nsGreenTime;
+        break;
+
+      case "SOUTH_GREEN":
+        signal.phase = "SOUTH_YELLOW";
+        signal.remaining = yellowDuration;
+        break;
+
+      case "SOUTH_YELLOW":
+        signal.phase = "ALL_RED_TO_EAST";
+        signal.remaining = allRedDuration;
+        break;
+
+      case "ALL_RED_TO_EAST":
+        signal.phase = "EAST_GREEN";
+        signal.remaining = ewGreenTime;
+        break;
+
+      case "EAST_GREEN":
+        signal.phase = "EAST_YELLOW";
+        signal.remaining = yellowDuration;
+        break;
+
+      case "EAST_YELLOW":
+        signal.phase = "ALL_RED_TO_WEST";
+        signal.remaining = allRedDuration;
+        break;
+
+      case "ALL_RED_TO_WEST":
+        signal.phase = "WEST_GREEN";
+        signal.remaining = ewGreenTime;
+        break;
+
+      case "WEST_GREEN":
+        signal.phase = "WEST_YELLOW";
+        signal.remaining = yellowDuration;
+        break;
+
+      case "WEST_YELLOW":
+        signal.phase = "ALL_RED_TO_NORTH";
+        signal.remaining = allRedDuration;
+        break;
+
+      case "ALL_RED_TO_NORTH":
+      default:
+        signal.phase = "NORTH_GREEN";
+        signal.remaining = nsGreenTime;
+        break;
+    }
+
+    if (isConflictingGreen(signal)) {
+      signal.phase = "ALL_RED_TO_NORTH";
+      signal.remaining = 2;
+    }
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
   }
 
   function updateSignals(dt) {
     updateQueuesAndPriority();
+<<<<<<< HEAD
     const pedestrianDemand = Number(ui.pedestrianRange.value) / 100;
+=======
+    const pedestrianDemand = Number(ui?.pedestrianRange?.value || 20) / 100;
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
     for (const signal of signals) {
       signal.pedestrians = Math.min(24, signal.pedestrians + dt * pedestrianDemand * city.nodes[signal.id].pedestrianDemand * .05);
       if (signal.phase.startsWith("ALL_RED")) signal.pedestrians = Math.max(0, signal.pedestrians - dt * 1.8);
       else signal.pedestrianWait += signal.pedestrians * dt;
       signal.remaining -= dt;
       if (signal.requestedDirection) {
+<<<<<<< HEAD
         const currentDirection = phaseDirection(signal.phase);
         if (signal.phase === `${signal.requestedDirection}_GREEN`) signal.remaining = Math.max(signal.remaining, 5);
         else if (currentDirection && signal.phase.endsWith("GREEN")) signal.remaining = Math.min(signal.remaining, 1.2);
@@ -589,6 +912,16 @@
         if (signal.phase.startsWith("ALL_RED") && junctionOccupied(signal.id)) signal.remaining = .12;
         else advanceSignal(signal);
       }
+=======
+        if (signal.phase === `${signal.requestedDirection}_GREEN`) signal.remaining = Math.max(signal.remaining, 5);
+        else if (signal.phase.endsWith("GREEN")) signal.remaining = Math.min(signal.remaining, 1.2);
+      } else if (signal.requestedAxis) {
+        const currentAxis = phaseAxis(signal.phase);
+        if (currentAxis === signal.requestedAxis && signal.phase.endsWith("GREEN")) signal.remaining = Math.max(signal.remaining, 5);
+        else if (signal.phase.endsWith("GREEN")) signal.remaining = Math.min(signal.remaining, 1.2);
+      }
+      if (signal.remaining <= 0) advanceSignal(signal);
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
     }
   }
 
@@ -596,8 +929,13 @@
     if (vehicle.to >= 4 || city.nodes[vehicle.to]?.boundary) return true;
     const signal = signals[vehicle.to];
     if (!signal) return true;
+<<<<<<< HEAD
     const direction = incomingDirection(vehicle.from, vehicle.to);
     return signal.phase === `${direction}_GREEN`;
+=======
+    const dir = incomingDirection(vehicle.from, vehicle.to);
+    return signal.phase === `${dir}_GREEN`;
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
   }
   function laneGroupKey(vehicle) {
     if (vehicle.inTurn) return null;
@@ -780,6 +1118,7 @@
         const remaining = edge.length * (1 - vehicle.progress);
         const approachingSignal = vehicle.to < 4 && !city.nodes[vehicle.to]?.boundary;
         const allows = !approachingSignal || signalAllows(vehicle);
+<<<<<<< HEAD
         let downstreamLane = null;
         let downstreamBlocked = false;
         if (approachingSignal && vehicle.pathIndex < vehicle.path.length - 1 && remaining < 90) {
@@ -813,6 +1152,8 @@
           if (!downstreamBlocked) downstreamLane = findFreeLane(reached, plannedNext, vehicle.lane);
         }
         const movementBlocked = downstreamBlocked || downstreamLane === -1;
+=======
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
 
         // Turn indicator warning when approaching an intersection
         if (remaining < 110 && vehicle.pathIndex < vehicle.path.length - 1) {
@@ -872,11 +1213,15 @@
             }
           }
         } else if (isClosure && vehicle.progress < 0.5) {
+<<<<<<< HEAD
           // A vehicle already on a newly closed road safely reverses to its
           // previous node, then follows an open route to an outer exit.
           if (redirectFromClosedRoad(vehicle, edge)) continue;
 
           // Wait short of the closure until the opposite carriageway is clear.
+=======
+          // True road closure: vehicle stops safely before closure zone
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
           const distToClosure = (0.5 - vehicle.progress) * edge.length;
           if (distToClosure <= 24) {
             desired = 0;
@@ -984,6 +1329,7 @@
           }
         }
 
+<<<<<<< HEAD
         // Brake toward the stop line for red/yellow, or when the outbound lane
         // is occupied. This avoids the previous last-moment snap to zero.
         if (approachingSignal && (!allows || movementBlocked)) {
@@ -991,6 +1337,12 @@
           if (distanceToLine < 78) {
             const safeApproachSpeed = Math.sqrt(2 * COMFORTABLE_BRAKING * Math.max(0, distanceToLine));
             desired = Math.min(desired, safeApproachSpeed);
+=======
+        // Red signal stopping behavior: decelerate and stop before stop line (54px) & zebra crossing (38-50px)
+        if (approachingSignal && !allows) {
+          if (remaining < 64) {
+            desired = 0;
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
             vehicle.braking = true;
           }
         }
@@ -1005,10 +1357,16 @@
         totalFuel += fuelRate * dt * (vehicle.type === "bus" ? 1.8 : vehicle.type === "ambulance" ? 1.25 : 1);
         vehicle.progress += vehicle.currentSpeed * dt / edge.length;
 
+<<<<<<< HEAD
         // Strict stop-line enforcement applies both to a closed signal and to
         // a full/closed downstream road (do not block the junction box).
         if (approachingSignal && (!allows || movementBlocked)) {
           const maxStopProgress = (edge.length - STOP_LINE_DISTANCE) / edge.length;
+=======
+        // Strict stop line enforcement: cannot proceed past 58px before junction center while signal is not green
+        if (approachingSignal && !allows) {
+          const maxStopProgress = (edge.length - 58) / edge.length;
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
           if (vehicle.progress > maxStopProgress) {
             vehicle.progress = maxStopProgress;
             vehicle.currentSpeed = 0;
@@ -1028,13 +1386,19 @@
           }
         }
 
+<<<<<<< HEAD
         // Smooth cubic Bezier transition only after a green entry decision and
         // only when a receiving lane is actually available.
         if (remaining <= TURN_ENTRY_DISTANCE && allows && !movementBlocked && vehicle.pathIndex < vehicle.path.length - 1) {
+=======
+        // Smooth cubic Bezier turning curve transition when passing stop line (remaining <= 54px) and light allows
+        if (remaining <= 54 && allows && vehicle.pathIndex < vehicle.path.length - 1) {
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
           const reached = vehicle.to;
           const plannedNext = vehicle.path[vehicle.pathIndex + 1];
           const plannedEdge = edgeBetween(reached, plannedNext);
           if (plannedEdge && !blockedRoads().has(plannedEdge.key)) {
+<<<<<<< HEAD
             const actualTargetLane = downstreamLane == null
               ? findFreeLane(reached, plannedNext, vehicle.lane)
               : downstreamLane;
@@ -1045,6 +1409,10 @@
               vehicle.braking = true;
               continue;
             }
+=======
+            const targetLane = findFreeLane(reached, plannedNext, vehicle.lane);
+            const actualTargetLane = targetLane >= 0 ? targetLane : vehicle.lane;
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
             const a = city.nodes[vehicle.from];
             const b = city.nodes[reached];
             const c = city.nodes[plannedNext];
@@ -1075,6 +1443,7 @@
               p0, p1, p2, p3, length: Math.max(40, curveLen),
               nextFrom: reached, nextTo: plannedNext, nextLane: actualTargetLane
             };
+<<<<<<< HEAD
             const entryPhase = signals[reached]?.phase || "UNCONTROLLED";
             const entryDirection = incomingDirection(vehicle.from, reached);
             const entryAxis = directionAxis(entryDirection);
@@ -1088,6 +1457,8 @@
             });
             if (entryPhase !== `${entryDirection}_GREEN`) redLightViolations += 1;
             if (junctionEntries.length > 300) junctionEntries.shift();
+=======
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
             continue;
           }
         }
@@ -1097,6 +1468,7 @@
         const reached = vehicle.to;
         vehicle.progress = 0;
         if (reached === vehicle.target || vehicle.pathIndex >= vehicle.path.length - 1) {
+<<<<<<< HEAD
           if (vehicle.type !== "ambulance" && !city.boundaryNodes.includes(reached)) {
             const escapeRoute = reachableExitRoute(vehicle, reached);
             if (escapeRoute.length >= 2) {
@@ -1120,6 +1492,11 @@
             vehicleExits.push({ vehicleId: vehicle.id, spawnNode: vehicle.spawnNode, exitNode: reached, time: simulationTime });
             if (vehicleExits.length > 500) vehicleExits.shift();
           }
+=======
+          completed.push(vehicle.id);
+          completedVehicles += 1;
+          totalCompletedTravel += vehicle.travelTime;
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
           if (vehicle.type === "ambulance") {
             corridorCompleted += vehicle.travelTime;
             corridorBaseline += Math.max(vehicle.freeFlowSeconds * 1.65, vehicle.travelTime * 1.28);
@@ -1156,7 +1533,10 @@
           vehicle.currentLateralOffset = vehicle.targetLateralOffset;
           const factor = vehicle.type === "ambulance" ? 1.12 : vehicle.type === "bus" ? .7 : vehicle.type === "service" ? .82 : .9;
           vehicle.speed = plannedEdge.speed * factor;
+<<<<<<< HEAD
           if (vehicle.state === "REROUTING_FROM_CLOSURE") vehicle.state = "NORMAL";
+=======
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
         }
       }
     }
@@ -1910,6 +2290,7 @@
       if (!node) continue;
       const cx = node.x, cy = node.y;
 
+<<<<<<< HEAD
       // Four-way controller: exactly one physical approach may be green.
       const northPhase = phaseColor(signal.phase, "N");
       const southPhase = phaseColor(signal.phase, "S");
@@ -1929,6 +2310,36 @@
 
       // ── Preemption aura when emergency vehicle is active ─────────────────
       if (signal.requestedDirection) {
+=======
+      // Phase colours computed for each approach direction (strictly one green at a time)
+      let northColor = directionColor(signal.phase, "NORTH");
+      let southColor = directionColor(signal.phase, "SOUTH");
+      let eastColor = directionColor(signal.phase, "EAST");
+      let westColor = directionColor(signal.phase, "WEST");
+
+      // Safety check: NEVER allow any two greens together
+      const greens = [northColor, southColor, eastColor, westColor].filter(c => c === "green").length;
+      if (greens > 1) {
+        northColor = "red";
+        southColor = "red";
+        eastColor = "red";
+        westColor = "red";
+      }
+
+      // ── 4 separate signal heads, one per approach direction ──────────────
+      // Positioned at the stop-line on the driver's left (right-hand traffic).
+      // North approach — vehicles travel South, lanes west of centreline
+      drawSignalHead(cx - 34, cy - 58, northColor, "N");
+      // South approach — vehicles travel North, lanes east of centreline
+      drawSignalHead(cx + 34, cy + 58, southColor, "S");
+      // West approach  — vehicles travel East, lanes south of centreline
+      drawSignalHead(cx - 58, cy + 34, westColor, "W");
+      // East approach  — vehicles travel West, lanes north of centreline
+      drawSignalHead(cx + 58, cy - 34, eastColor, "E");
+
+      // ── Preemption aura when emergency vehicle is active ─────────────────
+      if (signal.requestedDirection || signal.requestedAxis) {
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
         ctx.strokeStyle = COLORS.mint;
         ctx.lineWidth = 2.5;
         ctx.beginPath();
@@ -1936,17 +2347,36 @@
         ctx.stroke();
       }
 
+<<<<<<< HEAD
       // ── Centre badge: one active direction, all other approaches red ──────
       const activeDirection = phaseDirection(signal.phase);
       const activeColor = signal.phase.endsWith("GREEN") ? COLORS.mint :
         signal.phase.endsWith("YELLOW") ? COLORS.amber : COLORS.red;
       const remainingSeconds = Math.max(0, Math.ceil(signal.remaining));
+=======
+      // ── Centre badge (shows active direction and timer) ─────────────
+      const remSec = Math.max(0, Math.ceil(signal.remaining));
+      let activeDir = "ALL RED";
+      let badgeColor = COLORS.red;
+      if (signal.phase === "NORTH_GREEN") { activeDir = "NORTH"; badgeColor = COLORS.mint; }
+      else if (signal.phase === "NORTH_YELLOW") { activeDir = "NORTH"; badgeColor = COLORS.amber; }
+      else if (signal.phase === "SOUTH_GREEN") { activeDir = "SOUTH"; badgeColor = COLORS.mint; }
+      else if (signal.phase === "SOUTH_YELLOW") { activeDir = "SOUTH"; badgeColor = COLORS.amber; }
+      else if (signal.phase === "EAST_GREEN") { activeDir = "EAST"; badgeColor = COLORS.mint; }
+      else if (signal.phase === "EAST_YELLOW") { activeDir = "EAST"; badgeColor = COLORS.amber; }
+      else if (signal.phase === "WEST_GREEN") { activeDir = "WEST"; badgeColor = COLORS.mint; }
+      else if (signal.phase === "WEST_YELLOW") { activeDir = "WEST"; badgeColor = COLORS.amber; }
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
 
       ctx.save();
       ctx.fillStyle = "rgba(5, 13, 22, 0.90)";
       ctx.strokeStyle = "rgba(180, 210, 235, 0.35)";
       ctx.lineWidth = 1;
+<<<<<<< HEAD
       const badgeW = 72, badgeH = 28;
+=======
+      const badgeW = 56, badgeH = 26;
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
       if (typeof ctx.roundRect === "function") {
         ctx.beginPath();
         ctx.roundRect(cx - badgeW / 2, cy - badgeH / 2, badgeW, badgeH, 4);
@@ -1959,10 +2389,17 @@
       ctx.font = "bold 8px ui-monospace, monospace";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
+<<<<<<< HEAD
       ctx.fillStyle = activeColor;
       ctx.fillText(activeDirection ? `${activeDirection} ${signal.phase.endsWith("GREEN") ? remainingSeconds + "s" : "YELLOW"}` : "ALL RED", cx, cy - 6);
       ctx.fillStyle = COLORS.red;
       ctx.fillText(activeDirection ? "OTHER 3 RED" : `${remainingSeconds}s CLEAR`, cx, cy + 7);
+=======
+      ctx.fillStyle = badgeColor;
+      ctx.fillText(activeDir, cx, cy - 6);
+      ctx.fillStyle = "rgba(220, 235, 250, 0.9)";
+      ctx.fillText(`${remSec}s`, cx, cy + 6);
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
       ctx.restore();
 
       // ── Camera icon if toggled ────────────────────────────────────────────
@@ -2336,6 +2773,7 @@
     ui.junctionName.textContent = `J-${label(selectedJunction)}`;
     ui.junctionTitle.textContent = city.nodes[selectedJunction].name;
     ui.cameraName.textContent = cameras.has(selectedJunction) ? `CAM-${label(selectedJunction)}` : `VIRTUAL-${label(selectedJunction)}`;
+<<<<<<< HEAD
     const directionColors = Object.fromEntries(SIGNAL_DIRECTIONS.map(direction => [direction, phaseColor(signal.phase, direction)]));
     setLight(ui.nLight, directionColors.N);
     setLight(ui.sLight, directionColors.S);
@@ -2345,6 +2783,20 @@
     ui.sSignalText.textContent = directionColors.S.toUpperCase();
     ui.eSignalText.textContent = directionColors.E.toUpperCase();
     ui.wSignalText.textContent = directionColors.W.toUpperCase();
+=======
+    const northColor = directionColor(signal.phase, "NORTH");
+    const southColor = directionColor(signal.phase, "SOUTH");
+    const eastColor = directionColor(signal.phase, "EAST");
+    const westColor = directionColor(signal.phase, "WEST");
+    const nsColor = (northColor === "green" || southColor === "green") ? "green" : ((northColor === "yellow" || southColor === "yellow") ? "yellow" : "red");
+    const ewColor = (eastColor === "green" || westColor === "green") ? "green" : ((eastColor === "yellow" || westColor === "yellow") ? "yellow" : "red");
+    setLight(ui.nsLight, nsColor);
+    setLight(ui.ewLight, ewColor);
+    ui.nsSignalText.textContent = northColor === "green" ? "NORTH GREEN" : (southColor === "green" ? "SOUTH GREEN" : (northColor === "yellow" ? "NORTH YEL" : (southColor === "yellow" ? "SOUTH YEL" : "RED")));
+    ui.ewSignalText.textContent = eastColor === "green" ? "EAST GREEN" : (westColor === "green" ? "WEST GREEN" : (eastColor === "yellow" ? "EAST YEL" : (westColor === "yellow" ? "WEST YEL" : "RED")));
+    ui.nsQueue.textContent = signal.nsQueue;
+    ui.ewQueue.textContent = signal.ewQueue;
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
     ui.phaseLabel.textContent = signal.phase.replaceAll("_", " ");
     ui.phaseTimer.textContent = `${Math.max(0, Math.ceil(signal.remaining))}s`;
     ui.junctionDensity.textContent = `${Math.round(localVehicles / Math.max(1, capacity) * 100)}%`;
@@ -2359,10 +2811,17 @@
 
     // Directional Queues & Classes for Selected Junction
     const localVehs = vehicles.filter(v => v.to === selectedJunction || v.from === selectedJunction);
+<<<<<<< HEAD
     if (ui.northQueue) ui.northQueue.textContent = signal.directionQueues.N;
     if (ui.southQueue) ui.southQueue.textContent = signal.directionQueues.S;
     if (ui.eastQueue) ui.eastQueue.textContent = signal.directionQueues.E;
     if (ui.westQueue) ui.westQueue.textContent = signal.directionQueues.W;
+=======
+    if (ui.northQueue) ui.northQueue.textContent = signal.northQueue ?? Math.round(signal.nsQueue * 0.55);
+    if (ui.southQueue) ui.southQueue.textContent = signal.southQueue ?? Math.round(signal.nsQueue * 0.45);
+    if (ui.eastQueue) ui.eastQueue.textContent = signal.eastQueue ?? Math.round(signal.ewQueue * 0.6);
+    if (ui.westQueue) ui.westQueue.textContent = signal.westQueue ?? Math.round(signal.ewQueue * 0.4);
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
 
     if (ui.carCount) ui.carCount.textContent = localVehs.filter(v => v.type === "car").length;
     if (ui.busCount) ui.busCount.textContent = localVehs.filter(v => v.type === "bus").length;
@@ -2552,6 +3011,7 @@
         id: vehicle.id, type: vehicle.type, from: vehicle.from, to: vehicle.to,
         lane: vehicle.lane, progress: vehicle.progress, state: vehicle.state,
         currentSpeed: vehicle.currentSpeed, stopped: vehicle.stopped,
+<<<<<<< HEAD
         spawnNode: vehicle.spawnNode, spawnPointId: vehicle.spawnPointId,
         target: vehicle.target, path: [...vehicle.path], pathIndex: vehicle.pathIndex,
         inTurn: vehicle.inTurn
@@ -2568,10 +3028,33 @@
       vehicleSpawns: vehicleSpawns.map(spawn => ({ ...spawn })),
       vehicleExits: vehicleExits.map(exit => ({ ...exit })),
       closureJunctionDetours: closureJunctionDetours.map(detour => ({ ...detour })),
+=======
+        path: [...vehicle.path], target: vehicle.target
+      })),
+      signals: signals.map(s => ({
+        id: s.id,
+        phase: s.phase,
+        remaining: s.remaining,
+        northColor: directionColor(s.phase, "NORTH"),
+        southColor: directionColor(s.phase, "SOUTH"),
+        eastColor: directionColor(s.phase, "EAST"),
+        westColor: directionColor(s.phase, "WEST"),
+        nsColor: phaseColor(s.phase, "NS"),
+        ewColor: phaseColor(s.phase, "EW"),
+        isConflicting: isConflictingGreen(s)
+      })),
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
       overlaps: overlapCount(),
       activeRoadEvents: roadEvents.size,
       completedVehicles
     }),
+<<<<<<< HEAD
+=======
+    isConflictingGreen: (signal) => isConflictingGreen(signal),
+    directionColor: (phase, dir) => directionColor(phase, dir),
+    phaseColor: (phase, axis) => phaseColor(phase, axis),
+    chooseBoundaryPair: () => chooseBoundaryPair(),
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
     injectRoadEvent: (edgeId, type, options) => {
       const edge = city.edges[edgeId];
       if (edge) addRoadEvent(edge, type, options);
@@ -2583,11 +3066,21 @@
   function initTabs() {
     const tabButtons = [
       ui.tabLiveBtn, ui.tabNetworkBtn, ui.tabEmergencyBtn,
+<<<<<<< HEAD
       ui.tabEventsBtn, ui.tabMetricsBtn, ui.tabResearchBtn, ui.tabRealworldBtn
     ];
     const tabPanes = [
       ui.tabLive, ui.tabNetwork, ui.tabEmergency,
       ui.tabEvents, ui.tabMetrics, ui.tabResearch, ui.tabRealworld
+=======
+      ui.tabEventsBtn, ui.tabMetricsBtn, ui.tabResearchBtn, ui.tabRealworldBtn,
+      ui.tabRealtimeBtn
+    ];
+    const tabPanes = [
+      ui.tabLive, ui.tabNetwork, ui.tabEmergency,
+      ui.tabEvents, ui.tabMetrics, ui.tabResearch, ui.tabRealworld,
+      ui.tabRealtime
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
     ];
     tabButtons.forEach(btn => {
       if (!btn) return;
@@ -2613,6 +3106,21 @@
         });
       });
     });
+<<<<<<< HEAD
+=======
+
+    function activateRealtimeTab() {
+      if (ui.tabRealtimeBtn) {
+        ui.tabRealtimeBtn.click();
+        const rightPanel = document.querySelector(".right-panel");
+        if (rightPanel) rightPanel.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    }
+    const topNavBtn = document.getElementById("topNavLiveDetectionBtn");
+    if (topNavBtn) topNavBtn.addEventListener("click", activateRealtimeTab);
+    const leftNavBtn = document.getElementById("leftNavLiveDetectionBtn");
+    if (leftNavBtn) leftNavBtn.addEventListener("click", activateRealtimeTab);
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
   }
 
   function resetSimulation() {
@@ -2625,10 +3133,13 @@
     baselineCo2 = 0;
     corridorCompleted = 0;
     corridorBaseline = 0;
+<<<<<<< HEAD
     closureRedirects = 0;
     vehicleExits = [];
     vehicleSpawns = [];
     closureJunctionDetours = [];
+=======
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
     roadEvents.clear();
     vehicles = [];
     signals = city.nodes.map(makeSignal);
@@ -2698,7 +3209,10 @@
     for (const signal of signals) {
       signal.priorityActive = false;
       signal.requestedAxis = null;
+<<<<<<< HEAD
       signal.requestedDirection = null;
+=======
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
     }
     vehicles = vehicles.filter(v => v.type !== "ambulance");
     addEvent("Emergency corridor released", "Priority preemption released; signals restored to canonical QUBO", "normal");
@@ -2958,6 +3472,223 @@
     });
   }
 
+<<<<<<< HEAD
+=======
+  // =========================================================================
+  // Real-Time Camera Detection Dashboard (Vehicles + Pedestrians Only)
+  // =========================================================================
+  let realtimePollTimer = null;
+
+  function stopRealtimeTelemetry() {
+    if (realtimePollTimer) {
+      clearInterval(realtimePollTimer);
+      realtimePollTimer = null;
+    }
+  }
+
+  function startRealtimeTelemetry() {
+    stopRealtimeTelemetry();
+    realtimePollTimer = setInterval(async () => {
+      try {
+        const res = await fetch("/api/perception/live/status");
+        if (!res.ok) return;
+        const data = await res.json();
+        updateRealtimeDashboard(data);
+      } catch (_) {}
+    }, 250);
+  }
+
+  function updateRealtimeDashboard(data) {
+    if (!data) return;
+    const counts = data.counts || {};
+    const appr = data.approaches || {};
+    const ql = data.queue_lengths || {};
+
+    if (ui.rtCamStatusText) {
+      const st = (data.status || "STANDBY").toUpperCase();
+      ui.rtCamStatusText.textContent = st;
+      ui.rtCamStatusText.style.color = (st === "RUNNING" || st === "CONNECTED") ? "var(--mint)" : (st === "UNAVAILABLE" || st === "ERROR" ? "var(--red)" : "var(--amber)");
+    }
+
+    if (ui.rtYoloStatusText) {
+      ui.rtYoloStatusText.textContent = data.yolo_status || "READY";
+    }
+    if (ui.rtTrackingStatusText) {
+      ui.rtTrackingStatusText.textContent = data.tracking_status || "ACTIVE";
+    }
+
+    if (ui.rtHeroVehicleCount) ui.rtHeroVehicleCount.textContent = counts.total_vehicles ?? 0;
+    if (ui.rtHeroPedestrianCount) ui.rtHeroPedestrianCount.textContent = counts.total_pedestrians ?? 0;
+
+    if (ui.rtCountCar) ui.rtCountCar.textContent = counts.cars ?? 0;
+    if (ui.rtCountMoto) ui.rtCountMoto.textContent = counts.motorcycles ?? 0;
+    if (ui.rtCountBus) ui.rtCountBus.textContent = counts.buses ?? 0;
+    if (ui.rtCountTruck) ui.rtCountTruck.textContent = counts.trucks ?? 0;
+
+    if (ui.rtTotalTracked) ui.rtTotalTracked.textContent = counts.total_tracked_entities ?? 0;
+    if (ui.rtConfidencePercent) ui.rtConfidencePercent.textContent = `${(counts.average_confidence ?? 0).toFixed(1)}%`;
+    if (ui.rtFpsDisplay) ui.rtFpsDisplay.textContent = `${(data.inference_fps_actual ?? 0).toFixed(1)} FPS`;
+
+    const vehAppr = appr.vehicles || {};
+    if (ui.rtApprVehNorth) ui.rtApprVehNorth.textContent = vehAppr.north ?? 0;
+    if (ui.rtApprVehSouth) ui.rtApprVehSouth.textContent = vehAppr.south ?? 0;
+    if (ui.rtApprVehEast) ui.rtApprVehEast.textContent = vehAppr.east ?? 0;
+    if (ui.rtApprVehWest) ui.rtApprVehWest.textContent = vehAppr.west ?? 0;
+
+    const pedAppr = appr.pedestrians || {};
+    if (ui.rtApprPedNorth) ui.rtApprPedNorth.textContent = pedAppr.north ?? 0;
+    if (ui.rtApprPedSouth) ui.rtApprPedSouth.textContent = pedAppr.south ?? 0;
+    if (ui.rtApprPedEast) ui.rtApprPedEast.textContent = pedAppr.east ?? 0;
+    if (ui.rtApprPedWest) ui.rtApprPedWest.textContent = pedAppr.west ?? 0;
+
+    if (ui.rtQueueN) ui.rtQueueN.textContent = ql.north ?? 0;
+    if (ui.rtQueueS) ui.rtQueueS.textContent = ql.south ?? 0;
+    if (ui.rtQueueE) ui.rtQueueE.textContent = ql.east ?? 0;
+    if (ui.rtQueueW) ui.rtQueueW.textContent = ql.west ?? 0;
+    if (ui.rtQueueActiveState) {
+      ui.rtQueueActiveState.textContent = (counts.total_tracked_entities > 0) ? "ACTIVE" : "STANDBY";
+      ui.rtQueueActiveState.style.color = (counts.total_tracked_entities > 0) ? "var(--mint)" : "var(--muted)";
+    }
+  }
+
+  if (ui.rtSourceSelect) {
+    ui.rtSourceSelect.addEventListener("change", () => {
+      if (ui.rtCustomPathGroup) {
+        ui.rtCustomPathGroup.style.display = ui.rtSourceSelect.value === "video-custom" ? "block" : "none";
+      }
+    });
+  }
+
+  if (ui.rtConfidenceSlider) {
+    ui.rtConfidenceSlider.addEventListener("input", () => {
+      if (ui.rtConfValueDisplay) {
+        ui.rtConfValueDisplay.textContent = `${Math.round(parseFloat(ui.rtConfidenceSlider.value) * 100)}%`;
+      }
+    });
+  }
+
+  if (ui.btnDismissRtError) {
+    ui.btnDismissRtError.addEventListener("click", () => {
+      if (ui.rtStreamErrorBox) ui.rtStreamErrorBox.style.display = "none";
+    });
+  }
+
+  if (ui.btnStartRealtime) {
+    ui.btnStartRealtime.addEventListener("click", async () => {
+      const srcVal = ui.rtSourceSelect ? ui.rtSourceSelect.value : "camera-0";
+      const intersectionId = ui.rtIntersectionSelect ? ui.rtIntersectionSelect.value : "J1";
+      const conf = ui.rtConfidenceSlider ? parseFloat(ui.rtConfidenceSlider.value) : 0.35;
+      const fps = ui.rtInferenceFpsSelect ? parseFloat(ui.rtInferenceFpsSelect.value) : 10.0;
+
+      let sourceType = "camera";
+      let cameraIndex = 0;
+      let videoPath = undefined;
+
+      if (srcVal === "camera-0") {
+        sourceType = "camera";
+        cameraIndex = 0;
+      } else if (srcVal === "camera-1") {
+        sourceType = "camera";
+        cameraIndex = 1;
+      } else if (srcVal === "video-sample") {
+        sourceType = "video";
+        videoPath = "data/synthetic/sample_traffic_frame.jpg";
+      } else if (srcVal === "video-custom") {
+        sourceType = "video";
+        videoPath = ui.rtCustomPathInput ? ui.rtCustomPathInput.value.trim() : "";
+        if (!videoPath) {
+          showToast("Please enter a valid video file path.");
+          return;
+        }
+      }
+
+      if (ui.rtCamStatusText) {
+        ui.rtCamStatusText.textContent = "CONNECTING...";
+        ui.rtCamStatusText.style.color = "var(--amber)";
+      }
+
+      try {
+        const payload = {
+          source_type: sourceType,
+          camera_index: cameraIndex,
+          video_path: videoPath,
+          intersection_id: intersectionId,
+          confidence_threshold: conf,
+          inference_fps: fps
+        };
+
+        const res = await fetch("/api/perception/live/start", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          if (ui.rtLiveStreamImg) {
+            ui.rtLiveStreamImg.src = `/api/perception/live/stream?t=${Date.now()}`;
+            ui.rtLiveStreamImg.style.display = "block";
+          }
+          if (ui.rtStreamPlaceholder) ui.rtStreamPlaceholder.style.display = "none";
+          if (ui.rtStreamErrorBox) ui.rtStreamErrorBox.style.display = "none";
+          if (ui.rtVideoViewport) ui.rtVideoViewport.classList.add("active");
+
+          updateRealtimeDashboard(data);
+          startRealtimeTelemetry();
+          showToast(`Real-time detection started on ${intersectionId} (${sourceType.toUpperCase()}).`);
+          addEvent("Real-time perception", `Started detection for ${intersectionId} (${sourceType}, conf: ${Math.round(conf * 100)}%, fps: ${fps}) [Signal Control: DISABLED]`, "normal");
+        } else {
+          if (ui.rtStreamErrorBox) {
+            if (ui.rtStreamErrorMsg) ui.rtStreamErrorMsg.textContent = data.error || "Device not available.";
+            ui.rtStreamErrorBox.style.display = "flex";
+          }
+          if (ui.rtCamStatusText) {
+            ui.rtCamStatusText.textContent = "UNAVAILABLE";
+            ui.rtCamStatusText.style.color = "var(--red)";
+          }
+          showToast(`Camera error: ${data.error || "unavailable"}`);
+        }
+      } catch (err) {
+        if (ui.rtStreamErrorBox) {
+          if (ui.rtStreamErrorMsg) ui.rtStreamErrorMsg.textContent = err.message;
+          ui.rtStreamErrorBox.style.display = "flex";
+        }
+        if (ui.rtCamStatusText) {
+          ui.rtCamStatusText.textContent = "ERROR";
+          ui.rtCamStatusText.style.color = "var(--red)";
+        }
+        showToast(`Failed to start camera: ${err.message}`);
+      }
+    });
+  }
+
+  if (ui.btnStopRealtime) {
+    ui.btnStopRealtime.addEventListener("click", async () => {
+      stopRealtimeTelemetry();
+      try {
+        const res = await fetch("/api/perception/live/stop", { method: "POST" });
+        const data = await res.json();
+        updateRealtimeDashboard(data);
+      } catch (_) {}
+
+      if (ui.rtLiveStreamImg) {
+        ui.rtLiveStreamImg.src = "";
+        ui.rtLiveStreamImg.style.display = "none";
+      }
+      if (ui.rtStreamPlaceholder) ui.rtStreamPlaceholder.style.display = "block";
+      if (ui.rtVideoViewport) ui.rtVideoViewport.classList.remove("active");
+      if (ui.rtCamStatusText) {
+        ui.rtCamStatusText.textContent = "STOPPED";
+        ui.rtCamStatusText.style.color = "var(--amber)";
+      }
+      if (ui.rtFpsDisplay) ui.rtFpsDisplay.textContent = "0.0 FPS";
+      showToast("Real-time camera detection stopped.");
+      addEvent("Real-time perception", "Detection engine stopped. Temporary tracking state released.", "normal");
+    });
+  }
+
+>>>>>>> a608c39 (Update Quantum Traffic Optimization project)
 
   canvas.addEventListener("wheel", event => {
     event.preventDefault();
